@@ -17,43 +17,46 @@ export function SavedPrompts({ savedOutlines, onLoad, onDelete }: SavedPromptsPr
   
   const renderOutline = (outline: string) => {
     return outline.split('\n').filter(line => line.trim() !== '').map((line, index) => {
-      if (line.match(/^#+\s/)) {
-        return <h4 key={index} className="text-md font-semibold mt-3 mb-1 text-primary">{line.replace(/#+\s/, '')}</h4>;
+      if (line.match(/^##\s/)) {
+        return <h3 key={index} className="text-xl font-headline font-bold mt-6 mb-3 text-primary">{line.replace(/##\s/, '')}</h3>;
+      }
+      if (line.match(/^###\s/)) {
+        return <h4 key={index} className="text-lg font-headline font-semibold mt-4 mb-2 text-primary/80">{line.replace(/###\s/, '')}</h4>;
       }
       if (line.startsWith('- ')) {
-        return <li key={index} className="ml-4 list-disc text-sm text-foreground/80">{line.substring(2)}</li>;
+        return <li key={index} className="ml-4 list-disc text-sm text-foreground/80 leading-relaxed">{line.substring(2)}</li>;
       }
-      return <p key={index} className="mb-1 text-sm text-foreground/90">{line}</p>;
+      return <p key={index} className="mb-2 text-sm text-foreground/90 leading-relaxed">{line}</p>;
     });
   };
 
   return (
-    <Card className="h-full">
+    <Card>
       <CardHeader>
-        <CardTitle>Review Past Outlines</CardTitle>
-        <CardDescription>Access your saved prompts and outlines.</CardDescription>
+        <CardTitle className="font-headline text-3xl">Outline History</CardTitle>
+        <CardDescription>Review, reload, and refine your past creations.</CardDescription>
       </CardHeader>
       <CardContent>
         {savedOutlines.length === 0 ? (
-          <div className="flex flex-col items-center justify-center text-center text-muted-foreground py-10 border-2 border-dashed border-border rounded-lg h-full">
+          <div className="flex flex-col items-center justify-center text-center text-muted-foreground py-16 border-2 border-dashed border-border rounded-lg h-full bg-background/20">
             <FileText className="h-12 w-12 mb-4" />
-            <p className="font-semibold">No saved outlines yet.</p>
-            <p className="text-sm">Your saved speech outlines will appear here.</p>
+            <p className="font-semibold text-lg">No Saved Outlines</p>
+            <p className="text-sm">Your generated speech outlines will appear here once you save them.</p>
           </div>
         ) : (
-          <ScrollArea className="h-[60vh] pr-4">
-            <Accordion type="single" collapsible className="w-full space-y-2">
+          <ScrollArea className="h-[60vh] pr-4 -mr-4">
+            <Accordion type="single" collapsible className="w-full space-y-3">
               {savedOutlines.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()).map((item) => (
-                <AccordionItem value={item.id} key={item.id} className="border border-border rounded-lg bg-background/50 data-[state=open]:bg-accent/10">
-                  <AccordionTrigger className="text-left hover:no-underline px-4 py-3">
+                <AccordionItem value={item.id} key={item.id} className="border border-border rounded-lg bg-card/50 hover:border-primary/50 transition-colors data-[state=open]:border-primary/50">
+                  <AccordionTrigger className="text-left hover:no-underline px-4 py-3 text-lg">
                     <span className="truncate pr-4">{item.topic}</span>
                   </AccordionTrigger>
                   <AccordionContent className="px-4 pb-4">
-                    <div className="space-y-4 pt-2">
+                    <div className="space-y-4 pt-2 prose prose-invert max-w-none">
                       <div className="space-y-2">
                         {renderOutline(item.outline)}
                       </div>
-                      <div className="flex gap-2 justify-end pt-4 border-t border-border">
+                      <div className="flex gap-2 justify-end pt-4 border-t border-border mt-4">
                         <Button variant="ghost" size="sm" onClick={() => onLoad(item.topic)}>
                             <BookUp className="mr-2 h-4 w-4" /> Load Topic
                         </Button>

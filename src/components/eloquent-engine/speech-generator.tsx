@@ -5,10 +5,10 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { Form, FormControl, FormField, FormItem, FormMessage } from '@/components/ui/form';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
-import { Loader2, Save } from 'lucide-react';
+import { Loader2, Save, Wand2 } from 'lucide-react';
 import { getSpeechOutlineAction } from '@/app/actions';
 import { useToast } from '@/hooks/use-toast';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -48,6 +48,10 @@ export function SpeechGenerator({ onSave, activeTopic }: SpeechGeneratorProps) {
       const result = await getSpeechOutlineAction({ topic: values.topic });
       if (result.success && result.data) {
         setGeneratedOutline(result.data.outline);
+        toast({
+          title: 'Outline Generated!',
+          description: 'Your new speech outline is ready.',
+        });
       } else {
         toast({
           variant: 'destructive',
@@ -64,43 +68,46 @@ export function SpeechGenerator({ onSave, activeTopic }: SpeechGeneratorProps) {
       onSave({ topic, outline: generatedOutline });
       toast({
         title: 'Saved!',
-        description: 'Your speech outline has been saved.',
+        description: 'Your speech outline has been saved to your history.',
       });
     }
   };
   
   const renderOutline = (outline: string) => {
     return outline.split('\n').filter(line => line.trim() !== '').map((line, index) => {
-      if (line.match(/^#+\s/)) { // Matches h1, h2, h3 etc.
-        return <h3 key={index} className="text-xl font-semibold mt-6 mb-2 text-primary">{line.replace(/#+\s/, '')}</h3>;
+      if (line.match(/^##\s/)) { 
+        return <h3 key={index} className="text-2xl font-headline font-bold mt-8 mb-4 text-primary">{line.replace(/##\s/, '')}</h3>;
+      }
+      if (line.match(/^###\s/)) {
+        return <h4 key={index} className="text-xl font-headline font-semibold mt-6 mb-3 text-primary/80">{line.replace(/###\s/, '')}</h4>;
       }
       if (line.startsWith('- ')) {
-        return <li key={index} className="ml-6 list-disc text-foreground/80">{line.substring(2)}</li>;
+        return <li key={index} className="ml-6 list-disc text-foreground/80 leading-relaxed">{line.substring(2)}</li>;
       }
-      return <p key={index} className="mb-2 text-foreground/90">{line}</p>;
+      return <p key={index} className="mb-4 text-foreground/90 leading-relaxed">{line}</p>;
     });
   };
 
   return (
     <div className="space-y-8">
-      <Card>
+      <Card className="bg-card/50 border-border/50">
         <CardHeader>
-          <CardTitle>Create Your Speech</CardTitle>
-          <CardDescription>Enter a topic or a quote to generate a structured speech outline.</CardDescription>
+          <CardTitle className="font-headline text-3xl">Create Your Speech</CardTitle>
+          <CardDescription>Enter a topic, quote, or idea to generate a masterpiece.</CardDescription>
         </CardHeader>
         <CardContent>
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
               <FormField
                 control={form.control}
                 name="topic"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Topic / Quote</FormLabel>
                     <FormControl>
                       <Textarea
                         placeholder="e.g., 'The only way to do great work is to love what you do.' - Steve Jobs"
-                        rows={4}
+                        rows={3}
+                        className="text-base"
                         {...field}
                       />
                     </FormControl>
@@ -108,8 +115,8 @@ export function SpeechGenerator({ onSave, activeTopic }: SpeechGeneratorProps) {
                   </FormItem>
                 )}
               />
-              <Button type="submit" disabled={isPending}>
-                {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              <Button type="submit" disabled={isPending} size="lg">
+                {isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Wand2 className="mr-2" />}
                 Generate Outline
               </Button>
             </form>
@@ -137,20 +144,20 @@ export function SpeechGenerator({ onSave, activeTopic }: SpeechGeneratorProps) {
       {generatedOutline && !isPending && (
         <Card>
           <CardHeader>
-            <CardTitle>Your Generated Outline</CardTitle>
-            <CardDescription className="pt-2 break-words">
+            <CardTitle className="font-headline text-3xl">Your Generated Outline</CardTitle>
+            <CardDescription className="pt-2 break-words text-base">
               For topic: "{form.getValues('topic')}"
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="space-y-2">
+            <div className="prose prose-invert max-w-none">
               {renderOutline(generatedOutline)}
             </div>
           </CardContent>
           <CardFooter>
             <Button variant="outline" onClick={handleSave}>
               <Save className="mr-2 h-4 w-4" />
-              Save Outline
+              Save Outline to History
             </Button>
           </CardFooter>
         </Card>

@@ -41,7 +41,36 @@ const prompt = ai.definePrompt({
   name: 'generateSpeechOutlinePrompt',
   input: {schema: GenerateSpeechOutlineInputSchema},
   output: {schema: GenerateSpeechOutlineOutputSchema},
-  prompt: `You are an expert speechwriter. Generate a clear and concise speech outline based on the following topic or quote:\n\nTopic: {{{topic}}}\n\nThe outline should include:\n- An engaging introduction\n- 3-5 main points with brief explanations\n- A strong conclusion that summarizes the key takeaways\n\nEnsure the outline is structured for a short, impromptu speech.`,
+  prompt: `You are a world-champion public speaking coach, training a national finalist. Your task is to craft an exceptional, impromptu-style speech outline from the given topic. The structure should be compelling, clear, and designed for maximum impact.
+
+Topic: {{{topic}}}
+
+Your output MUST be a Markdown-formatted string and follow this structure precisely:
+
+## Introduction
+Start with a powerful, attention-grabbing hook. This could be a startling statistic, a provocative question, a short, vivid anecdote, or a powerful quote.
+Clearly state the speech's core message or argument.
+Briefly preview the main points you will cover.
+
+## Main Point 1: [Descriptive Title]
+Develop your first key idea.
+Use evidence, a brief story, or a logical argument to support it.
+Incorporate a rhetorical device (e.g., parallelism, analogy, or a rhetorical question).
+
+## Main Point 2: [Descriptive Title]
+Develop your second key idea.
+This point should build upon the first, creating a logical flow.
+Use a contrasting example or a different form of evidence than in the first point.
+
+## Main Point 3: [Descriptive Title]
+Develop your final key idea.
+This should be the emotional or logical crescendo of your speech.
+Connect this point back to the overall theme and the audience's experience.
+
+## Conclusion
+Summarize the main points in a fresh, memorable way (don't just list them).
+End with a powerful, lingering thought or a clear call to action that ties back to your introduction. Leave the audience with something to think about.
+`,
 });
 
 const generateSpeechOutlineFlow = ai.defineFlow(

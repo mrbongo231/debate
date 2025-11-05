@@ -39,6 +39,7 @@ export function PracticeTimer() {
       }, 1000);
     } else if (seconds === 0 && isActive) {
       setIsActive(false);
+      // Optionally, add a sound or notification here
     }
     
     return () => {
@@ -55,33 +56,33 @@ export function PracticeTimer() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Practice Timer</CardTitle>
-        <CardDescription>Time your speech to perfection.</CardDescription>
+        <CardTitle className="font-headline text-3xl">Practice Timer</CardTitle>
+        <CardDescription>Time your delivery to perfection.</CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
-        <div className="text-center">
-            <p className="text-7xl font-bold font-mono text-primary" suppressHydrationWarning>
+        <div className="text-center bg-muted/20 p-8 rounded-lg border border-border">
+            <p className="text-8xl font-bold font-mono text-primary" suppressHydrationWarning>
                 {isClient ? formatTime(seconds) : '00:00'}
             </p>
         </div>
         <div className="flex justify-center gap-4">
-          <Button onClick={() => setIsActive(!isActive)} size="lg" className="w-32">
+          <Button onClick={() => setIsActive(!isActive)} size="lg" className="w-40" variant={isActive ? "secondary" : "default"}>
             {isActive ? <Pause className="mr-2" /> : <Play className="mr-2" />}
             {isActive ? 'Pause' : 'Start'}
           </Button>
-          <Button onClick={reset} variant="outline" size="lg" className="w-32">
+          <Button onClick={reset} variant="outline" size="lg" className="w-40">
             <RotateCcw className="mr-2" />
             Reset
           </Button>
         </div>
-        <div className="flex items-center gap-2 max-w-sm mx-auto pt-4">
+        <div className="flex items-center gap-2 max-w-sm mx-auto pt-4 border-t border-border">
             <Input 
                 type="number"
                 value={inputMinutes}
                 onChange={(e) => setInputMinutes(e.target.value)}
-                placeholder="Minutes"
+                placeholder="Set minutes"
                 aria-label="Set timer minutes"
-                className="text-center"
+                className="text-center text-lg"
             />
             <Button onClick={handleSetTime}>Set Time</Button>
         </div>
