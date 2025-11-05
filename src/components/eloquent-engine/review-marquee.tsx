@@ -73,15 +73,22 @@ export function ReviewMarquee() {
   return (
     <div className="relative flex w-full flex-col items-center justify-center overflow-hidden rounded-lg border bg-background/50 py-20 md:shadow-xl">
         <h2 className="text-4xl font-extrabold tracking-tight font-headline text-center mb-12">Loved by Champions Nationwide</h2>
-      <div className="relative flex w-full flex-row items-center justify-center overflow-hidden">
-        <div className="flex w-max animate-marquee [--duration:60s] hover:[animation-play-state:paused]">
-          {[...reviews, ...reviews].map((review, i) => (
-            <div key={i} className="px-2.5">
-              <ReviewCard {...review} />
-            </div>
-          ))}
+        <div className="w-full inline-flex flex-nowrap overflow-hidden [mask-image:_linear-gradient(to_right,transparent_0,_black_128px,_black_calc(100%-128px),transparent_100%)]">
+            <ul className="flex items-center justify-center md:justify-start [&_li]:mx-4 animate-marquee-reverse">
+                {reviews.map((review) => (
+                    <li key={review.name}>
+                        <ReviewCard {...review} />
+                    </li>
+                ))}
+            </ul>
+             <ul className="flex items-center justify-center md:justify-start [&_li]:mx-4 animate-marquee-reverse" aria-hidden="true">
+                {reviews.map((review) => (
+                    <li key={review.name}>
+                        <ReviewCard {...review} />
+                    </li>
+                ))}
+            </ul>
         </div>
-      </div>
     </div>
   );
 }

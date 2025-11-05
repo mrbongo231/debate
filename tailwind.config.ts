@@ -109,8 +109,12 @@ export default {
         },
         'marquee': {
             from: { transform: 'translateX(0)' },
-            to: { transform: 'translateX(calc(-100% - var(--gap)))' },
+            to: { transform: 'translateX(-100%)' },
           },
+        'marquee-reverse': {
+            from: { transform: 'translateX(-100%)' },
+            to: { transform: 'translateX(0)' },
+        },
       },
       animation: {
         'accordion-down': 'accordion-down 0.2s ease-out',
@@ -118,7 +122,8 @@ export default {
         'fade-in': 'fade-in 0.5s ease-out forwards',
         'fade-in-up': 'fade-in-up 0.6s ease-out forwards',
         'blob': 'blob 7s infinite',
-        'marquee': 'marquee var(--duration, 60s) linear infinite',
+        'marquee': 'marquee 60s linear infinite',
+        'marquee-reverse': 'marquee-reverse 60s linear infinite',
       },
       animationDelay: {
         '100': '100ms',
