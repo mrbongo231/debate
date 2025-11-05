@@ -15,7 +15,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import type { SavedOutline } from '@/types';
 
 const formSchema = z.object({
-  topic: z.string().min(10, 'Please enter a topic or quote of at least 10 characters.'),
+  topic: z.string().min(1, 'Please enter a topic or quote.'),
 });
 
 interface SpeechGeneratorProps {
@@ -112,7 +112,7 @@ export function SpeechGenerator({ onSave, activeTopic }: SpeechGeneratorProps) {
                   <FormItem>
                     <FormControl>
                       <Textarea
-                        placeholder="e.g., 'The only way to do great work is to love what you do.' - Steve Jobs"
+                        placeholder="e.g., 'Hurricanes', 'Social Media', or 'The only way to do great work is to love what you do.' - Steve Jobs"
                         rows={3}
                         className="text-base"
                         {...field}
