@@ -47,7 +47,7 @@ export function SavedPrompts({ savedOutlines, onLoad, onDelete }: SavedPromptsPr
           <ScrollArea className="h-[60vh] pr-4 -mr-4">
             <Accordion type="single" collapsible className="w-full space-y-3">
               {savedOutlines.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()).map((item) => (
-                <AccordionItem value={item.id} key={item.id} className="border border-border rounded-lg bg-card/50 hover:border-primary/50 transition-colors data-[state=open]:border-primary/50">
+                <AccordionItem value={item.id} key={item.id} className="border border-border rounded-lg bg-card/50 hover:border-primary/50 transition-all duration-300 hover:scale-[1.02] data-[state=open]:scale-[1.02] data-[state=open]:border-primary/50">
                   <AccordionTrigger className="text-left hover:no-underline px-4 py-3 text-lg">
                     <span className="truncate pr-4">{item.topic}</span>
                   </AccordionTrigger>

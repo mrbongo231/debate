@@ -95,7 +95,7 @@ export default function ExtempPage() {
                   </FormItem>
                 )}
               />
-              <Button type="submit" disabled={isPending} size="lg" className="w-full md:w-auto bg-gradient-to-r from-primary to-secondary text-white hover:opacity-90 transition-all duration-300 hover:scale-105">
+              <Button type="submit" disabled={isPending} size="lg" className="w-full md:w-auto bg-gradient-to-r from-primary to-secondary text-white">
                 {isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Wand2 className="mr-2" />}
                 Generate Speech
               </Button>

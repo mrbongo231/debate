@@ -27,7 +27,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`font-body antialiased ${inter.variable} ${sora.variable}`}>
+      <body className={`font-body antialiased transition-colors duration-300 ease-in-out ${inter.variable} ${sora.variable}`}>
         <ThemeProvider
           attribute="class"
           defaultTheme="dark"
