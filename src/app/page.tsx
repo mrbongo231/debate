@@ -90,7 +90,7 @@ export default function HomePage() {
                                 Impromptu Outline
                             </Link>
                         </Button>
-                        <p className="text-sm text-muted-foreground w-56">Generate quick, structured outlines from a single topic.</p>
+                        <p className="text-sm text-muted-foreground w-56">Generate quick, structured outlines from a single topic or quote to kickstart your creativity.</p>
                      </div>
                     <div className="flex flex-col items-center gap-2 text-center animate-fade-in-up animation-delay-300">
                         <Button asChild className="w-56" variant="outline" size="lg">
@@ -99,7 +99,7 @@ export default function HomePage() {
                                 Extemp AI
                             </Link>
                         </Button>
-                        <p className="text-sm text-muted-foreground w-56">Craft full speeches with creative hooks and sourced evidence.</p>
+                        <p className="text-sm text-muted-foreground w-56">Craft a full, championship-level speech complete with creative hooks, sourced evidence, and a memorization summary.</p>
                     </div>
                 </div>
             )}
