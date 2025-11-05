@@ -1,6 +1,7 @@
 'use server';
 
 import { generateSpeechOutline, GenerateSpeechOutlineInput } from '@/ai/flows/generate-speech-outline';
+import { generateExtempSpeech, GenerateExtempSpeechInput } from '@/ai/flows/generate-extemp-speech';
 
 export async function getSpeechOutlineAction(input: GenerateSpeechOutlineInput) {
   try {
@@ -11,3 +12,13 @@ export async function getSpeechOutlineAction(input: GenerateSpeechOutlineInput) 
     return { success: false, error: 'Failed to generate speech outline.' };
   }
 }
+
+export async function getExtempSpeechAction(input: GenerateExtempSpeechInput) {
+    try {
+      const result = await generateExtempSpeech(input);
+      return { success: true, data: result };
+    } catch (error) {
+      console.error(error);
+      return { success: false, error: 'Failed to generate extemp speech.' };
+    }
+  }

@@ -1,0 +1,137 @@
+'use client';
+
+import { useState, useTransition, useEffect } from 'react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import * as z from 'zod';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Form, FormControl, FormField, FormItem, FormMessage } from '@/components/ui/form';
+import { Textarea } from '@/components/ui/textarea';
+import { Button } from '@/components/ui/button';
+import { Loader2, Wand2 } from 'lucide-react';
+import { getExtempSpeechAction } from '@/app/actions';
+import { useToast } from '@/hooks/use-toast';
+import { Skeleton } from '@/components/ui/skeleton';
+
+const formSchema = z.object({
+  topic: z.string().min(1, 'Please enter a topic.'),
+});
+
+export default function ExtempPage() {
+  const [isPending, startTransition] = useTransition();
+  const [generatedSpeech, setGeneratedSpeech] = useState<string | null>(null);
+  const { toast } = useToast();
+
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      topic: '',
+    },
+  });
+
+  const onSubmit = (values: z.infer<typeof formSchema>) => {
+    setGeneratedSpeech(null);
+    startTransition(async () => {
+      const result = await getExtempSpeechAction({ topic: values.topic });
+      if (result.success && result.data) {
+        setGeneratedSpeech(result.data.speech);
+        toast({
+          title: 'Speech Generated!',
+          description: 'Your new extemporaneous speech is ready.',
+        });
+      } else {
+        toast({
+          variant: 'destructive',
+          title: 'Error',
+          description: result.error || 'Something went wrong.',
+        });
+      }
+    });
+  };
+  
+  const renderSpeech = (speech: string) => {
+    return speech.split('\n').filter(line => line.trim() !== '').map((line, index) => {
+      if (line.match(/^##\s/)) { 
+        return <h3 key={index} className="text-2xl font-bold mt-8 mb-4 text-primary">{line.replace(/##\s/, '')}</h3>;
+      }
+      if (line.match(/^###\s/)) {
+        return <h4 key={index} className="text-xl font-semibold mt-6 mb-3 text-primary/80">{line.replace(/###\s/, '')}</h4>;
+      }
+      if (line.startsWith('- ')) {
+        return <li key={index} className="ml-6 list-disc text-foreground/80 leading-relaxed">{line.substring(2)}</li>;
+      }
+      return <p key={index} className="mb-4 text-foreground/90 leading-relaxed">{line}</p>;
+    });
+  };
+
+  return (
+    <div className="space-y-8">
+      <Card className="bg-card/50 border-border/50">
+        <CardHeader>
+          <CardTitle className="text-3xl">Extemp AI</CardTitle>
+          <CardDescription>Enter a topic to generate a championship-level extemporaneous speech with a creative, comparative hook.</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+              <FormField
+                control={form.control}
+                name="topic"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormControl>
+                      <Textarea
+                        placeholder="e.g., 'Artificial Intelligence', 'Climate Change', or 'The gig economy'"
+                        rows={3}
+                        className="text-base"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <Button type="submit" disabled={isPending} size="lg">
+                {isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Wand2 className="mr-2" />}
+                Generate Speech
+              </Button>
+            </form>
+          </Form>
+        </CardContent>
+      </Card>
+
+      {isPending && (
+          <Card>
+              <CardHeader>
+                  <Skeleton className="h-8 w-3/4" />
+                  <Skeleton className="h-4 w-1/2 mt-2" />
+              </CardHeader>
+              <CardContent className="space-y-4 pt-6">
+                  <Skeleton className="h-6 w-1/3" />
+                  <Skeleton className="h-4 w-full" />
+                  <Skeleton className="h-4 w-5/6" />
+                  <Skeleton className="h-6 w-1/3 mt-4" />
+                  <Skeleton className="h-4 w-full" />
+                  <Skeleton className="h-4 w-full" />
+              </CardContent>
+          </Card>
+      )}
+
+      {generatedSpeech && !isPending && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-3xl">Your Generated Speech</CardTitle>
+            <CardDescription className="pt-2 break-words text-base">
+              For topic: "{form.getValues('topic')}"
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="prose prose-invert max-w-none">
+              {renderSpeech(generatedSpeech)}
+            </div>
+          </CardContent>
+        </Card>
+      )}
+    </div>
+  );
+}
