@@ -43,7 +43,7 @@ export default function Home() {
 
   return (
     <div className="space-y-12 my-8">
-      <div className="text-center">
+      <div className="text-center animate-fade-in-up">
         <h1 className="text-4xl font-extrabold tracking-tight lg:text-5xl font-headline bg-clip-text text-transparent bg-gradient-to-r from-primary to-secondary">
           Impromptu Outline Generator
         </h1>
@@ -54,7 +54,7 @@ export default function Home() {
 
       <SpeechGenerator onSave={handleSave} activeTopic={activeTopic} />
 
-      <Tabs defaultValue="history" className="w-full">
+      <Tabs defaultValue="history" className="w-full animate-fade-in-up animation-delay-400">
         <TabsList className="grid w-full grid-cols-2">
           <TabsTrigger value="history">
             <History className="mr-2" />

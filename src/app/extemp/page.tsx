@@ -66,7 +66,7 @@ export default function ExtempPage() {
 
   return (
     <div className="space-y-8 my-8">
-      <div className="text-center">
+      <div className="text-center animate-fade-in-up">
         <h1 className="text-4xl font-extrabold tracking-tight lg:text-5xl font-headline bg-clip-text text-transparent bg-gradient-to-r from-primary to-secondary">
           Extemp AI
         </h1>
@@ -74,7 +74,7 @@ export default function ExtempPage() {
           Enter a topic to generate a championship-level extemporaneous speech with a creative, comparative hook.
         </p>
       </div>
-      <Card className="border-border/40">
+      <Card className="border-border/40 animate-fade-in-up animation-delay-200">
         <CardContent className="pt-6">
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
@@ -95,7 +95,7 @@ export default function ExtempPage() {
                   </FormItem>
                 )}
               />
-              <Button type="submit" disabled={isPending} size="lg" className="w-full md:w-auto bg-gradient-to-r from-primary to-secondary text-white hover:opacity-90 transition-opacity">
+              <Button type="submit" disabled={isPending} size="lg" className="w-full md:w-auto bg-gradient-to-r from-primary to-secondary text-white hover:opacity-90 transition-all duration-300 hover:scale-105">
                 {isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Wand2 className="mr-2" />}
                 Generate Speech
               </Button>
@@ -105,7 +105,7 @@ export default function ExtempPage() {
       </Card>
 
       {isPending && (
-          <Card>
+          <Card className="animate-fade-in">
               <CardHeader>
                   <Skeleton className="h-8 w-3/4" />
                   <Skeleton className="h-4 w-1/2 mt-2" />
@@ -122,7 +122,7 @@ export default function ExtempPage() {
       )}
 
       {generatedSpeech && !isPending && (
-        <Card>
+        <Card className="animate-fade-in-up animation-delay-300">
           <CardHeader>
             <CardTitle className="text-3xl font-headline">Your Generated Speech</CardTitle>
             <CardDescription className="pt-2 break-words text-base">

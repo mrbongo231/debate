@@ -97,7 +97,7 @@ export function SpeechGenerator({ onSave, activeTopic }: SpeechGeneratorProps) {
 
   return (
     <div className="space-y-8">
-      <Card className="border-border/40">
+      <Card className="border-border/40 animate-fade-in-up">
         <CardHeader>
           <CardTitle className="text-xl">Create Your Speech</CardTitle>
           <CardDescription>Enter a topic, quote, or idea to generate a masterpiece.</CardDescription>
@@ -122,7 +122,7 @@ export function SpeechGenerator({ onSave, activeTopic }: SpeechGeneratorProps) {
                   </FormItem>
                 )}
               />
-              <Button type="submit" disabled={isPending} size="lg" className="w-full md:w-auto bg-gradient-to-r from-primary to-secondary text-white hover:opacity-90 transition-opacity">
+              <Button type="submit" disabled={isPending} size="lg" className="w-full md:w-auto bg-gradient-to-r from-primary to-secondary text-white hover:opacity-90 transition-all duration-300 hover:scale-105">
                 {isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Wand2 className="mr-2" />}
                 Generate Outline
               </Button>
@@ -132,7 +132,7 @@ export function SpeechGenerator({ onSave, activeTopic }: SpeechGeneratorProps) {
       </Card>
 
       {isPending && (
-          <Card>
+          <Card className="animate-fade-in">
               <CardHeader>
                   <Skeleton className="h-8 w-3/4" />
                   <Skeleton className="h-4 w-1/2 mt-2" />
@@ -149,7 +149,7 @@ export function SpeechGenerator({ onSave, activeTopic }: SpeechGeneratorProps) {
       )}
 
       {generatedOutline && !isPending && (
-        <Card>
+        <Card className="animate-fade-in-up animation-delay-300">
           <CardHeader>
             <CardTitle className="text-3xl font-headline">Your Generated Outline</CardTitle>
             <CardDescription className="pt-2 break-words text-base">
@@ -162,7 +162,7 @@ export function SpeechGenerator({ onSave, activeTopic }: SpeechGeneratorProps) {
             </div>
           </CardContent>
           <CardFooter>
-            <Button variant="outline" onClick={handleSave}>
+            <Button variant="outline" onClick={handleSave} className="transition-all duration-300 hover:scale-105">
               <Save className="mr-2 h-4 w-4" />
               Save Outline to History
             </Button>
