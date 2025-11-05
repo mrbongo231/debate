@@ -56,7 +56,7 @@ export function PracticeTimer() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="font-headline text-3xl">Practice Timer</CardTitle>
+        <CardTitle className="text-3xl">Practice Timer</CardTitle>
         <CardDescription>Time your delivery to perfection.</CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">

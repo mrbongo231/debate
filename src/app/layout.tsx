@@ -1,16 +1,10 @@
 import type {Metadata} from 'next';
 import './globals.css';
 import { Toaster } from '@/components/ui/toaster';
-import { Playfair_Display, Roboto } from 'next/font/google';
+import { Inter } from 'next/font/google';
 
-const playfair = Playfair_Display({
+const inter = Inter({
   subsets: ['latin'],
-  variable: '--font-headline',
-});
-
-const roboto = Roboto({
-  subsets: ['latin'],
-  weight: ['400', '700'],
   variable: '--font-body',
 });
 
@@ -26,7 +20,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`dark ${playfair.variable} ${roboto.variable}`} suppressHydrationWarning>
+    <html lang="en" className={`dark ${inter.variable}`} suppressHydrationWarning>
       <body className="font-body antialiased">
         {children}
         <Toaster />

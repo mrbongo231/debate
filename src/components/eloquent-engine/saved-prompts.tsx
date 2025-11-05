@@ -18,10 +18,10 @@ export function SavedPrompts({ savedOutlines, onLoad, onDelete }: SavedPromptsPr
   const renderOutline = (outline: string) => {
     return outline.split('\n').filter(line => line.trim() !== '').map((line, index) => {
       if (line.match(/^##\s/)) {
-        return <h3 key={index} className="text-xl font-headline font-bold mt-6 mb-3 text-primary">{line.replace(/##\s/, '')}</h3>;
+        return <h3 key={index} className="text-xl font-bold mt-6 mb-3 text-primary">{line.replace(/##\s/, '')}</h3>;
       }
       if (line.match(/^###\s/)) {
-        return <h4 key={index} className="text-lg font-headline font-semibold mt-4 mb-2 text-primary/80">{line.replace(/###\s/, '')}</h4>;
+        return <h4 key={index} className="text-lg font-semibold mt-4 mb-2 text-primary/80">{line.replace(/###\s/, '')}</h4>;
       }
       if (line.startsWith('- ')) {
         return <li key={index} className="ml-4 list-disc text-sm text-foreground/80 leading-relaxed">{line.substring(2)}</li>;
@@ -33,7 +33,7 @@ export function SavedPrompts({ savedOutlines, onLoad, onDelete }: SavedPromptsPr
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="font-headline text-3xl">Outline History</CardTitle>
+        <CardTitle className="text-3xl">Outline History</CardTitle>
         <CardDescription>Review, reload, and refine your past creations.</CardDescription>
       </CardHeader>
       <CardContent>

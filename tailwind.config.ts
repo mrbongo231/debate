@@ -12,7 +12,7 @@ export default {
     extend: {
       fontFamily: {
         body: ['var(--font-body)', ...fontFamily.sans],
-        headline: ['var(--font-headline)', ...fontFamily.serif],
+        headline: ['var(--font-body)', ...fontFamily.sans],
       },
       colors: {
         background: 'hsl(var(--background))',

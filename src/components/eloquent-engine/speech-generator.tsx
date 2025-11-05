@@ -76,10 +76,10 @@ export function SpeechGenerator({ onSave, activeTopic }: SpeechGeneratorProps) {
   const renderOutline = (outline: string) => {
     return outline.split('\n').filter(line => line.trim() !== '').map((line, index) => {
       if (line.match(/^##\s/)) { 
-        return <h3 key={index} className="text-2xl font-headline font-bold mt-8 mb-4 text-primary">{line.replace(/##\s/, '')}</h3>;
+        return <h3 key={index} className="text-2xl font-bold mt-8 mb-4 text-primary">{line.replace(/##\s/, '')}</h3>;
       }
       if (line.match(/^###\s/)) {
-        return <h4 key={index} className="text-xl font-headline font-semibold mt-6 mb-3 text-primary/80">{line.replace(/###\s/, '')}</h4>;
+        return <h4 key={index} className="text-xl font-semibold mt-6 mb-3 text-primary/80">{line.replace(/###\s/, '')}</h4>;
       }
       if (line.startsWith('- ')) {
         return <li key={index} className="ml-6 list-disc text-foreground/80 leading-relaxed">{line.substring(2)}</li>;
@@ -92,7 +92,7 @@ export function SpeechGenerator({ onSave, activeTopic }: SpeechGeneratorProps) {
     <div className="space-y-8">
       <Card className="bg-card/50 border-border/50">
         <CardHeader>
-          <CardTitle className="font-headline text-3xl">Create Your Speech</CardTitle>
+          <CardTitle className="text-3xl">Create Your Speech</CardTitle>
           <CardDescription>Enter a topic, quote, or idea to generate a masterpiece.</CardDescription>
         </CardHeader>
         <CardContent>
@@ -144,7 +144,7 @@ export function SpeechGenerator({ onSave, activeTopic }: SpeechGeneratorProps) {
       {generatedOutline && !isPending && (
         <Card>
           <CardHeader>
-            <CardTitle className="font-headline text-3xl">Your Generated Outline</CardTitle>
+            <CardTitle className="text-3xl">Your Generated Outline</CardTitle>
             <CardDescription className="pt-2 break-words text-base">
               For topic: "{form.getValues('topic')}"
             </CardDescription>

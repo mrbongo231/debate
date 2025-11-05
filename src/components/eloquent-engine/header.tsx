@@ -7,7 +7,7 @@ export function Header() {
         <div className="bg-primary/10 p-3 rounded-full border border-primary/20">
           <Mic className="h-8 w-8 text-primary" />
         </div>
-        <h1 className="text-5xl font-bold font-headline text-foreground">
+        <h1 className="text-5xl font-bold text-foreground">
           Eloquent Engine
         </h1>
         <p className="text-lg text-muted-foreground max-w-2xl">
