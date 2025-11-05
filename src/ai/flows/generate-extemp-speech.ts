@@ -48,10 +48,12 @@ const prompt = ai.definePrompt({
 
 Your task is to generate a full 7-minute extemporaneous speech based on the provided topic.
 
-**CRITICAL SOURCING RULES:**
+**CRITICAL SOURCING AND FORMATTING RULES:**
 1.  For all data and examples, you **MUST** use information from **recent (within the last 1-2 years)**, real, verifiable, and publicly accessible web pages.
-2.  You **MUST** provide direct, clickable markdown links to the exact pages you used as sources.
-3.  **DO NOT** invent URLs, fabricate sources, or reference non-existent pages. Every single source link **MUST** be verified to lead to a live, working webpage before you include it. Falsifying sources is strictly forbidden.
+2.  You **MUST** provide direct, clickable markdown links to the exact pages you used. Every single source link **MUST** be verified to lead to a live, working webpage. **DO NOT** invent URLs or fabricate sources.
+3.  **Output Structure:** The final output will be two JSON fields: 'speech' and 'sources'.
+    - The 'speech' field should contain **ONLY** the text of the speech. You can mention the source (e.g., "according to a report by..."), but **DO NOT** include the markdown link in the speech text itself.
+    - The 'sources' field must contain a markdown-formatted list of all sources used (e.g., "* [Source Title](https://example.com)"). Every piece of data or specific example in the speech must have a corresponding entry in this 'sources' list.
 
 Topic: {{{topic}}}
 
@@ -67,19 +69,17 @@ The speech MUST follow this structure and include these specific elements:
 ## Main Point 1: [Descriptive Title] (Approx. 2:00)
 -   **Claim:** State your first argument clearly.
 -   **Warrant:** Explain the logic behind your claim.
--   **Data/Example:** Provide a specific, credible piece of evidence (statistic, historical example, expert testimony) to support your claim. You MUST cite your source with a working link.
+-   **Data/Example:** Provide a specific, credible piece of evidence (statistic, historical example, expert testimony) to support your claim. Mention the source in the text, and add the full link to the 'sources' field.
 
 ## Main Point 2: [Descriptive Title] (Approx. 2:00)
 -   **Claim:** State your second argument, building on the first.
 -   **Warrant:** Explain the logic.
--   **Data/Example:** Provide a different kind of evidence than in the first point. If you used a statistic, maybe use an anecdote or a case study here. You MUST cite your source with a working link.
+-   **Data/Example:** Provide a different kind of evidence than in the first point. If you used a statistic, maybe use an anecdote or a case study here. Mention the source in the text, and add the full link to the 'sources' field.
 
 ## Conclusion (Approx. 1:30)
 1.  **Review:** Briefly summarize your main points in a fresh, impactful way. Do not just list them again.
 2.  **Bookend/Tie-back:** Circle back to the creative hook you used in the introduction. This creates a satisfying, cohesive feel.
 3.  **Final Thought:** End with a powerful, memorable statement that leaves the audience thinking. This could be a call to action, a profound thought, or a vision for the future.
-
-The final output will be two fields. The 'speech' field should be a single Markdown-formatted string containing the full speech. The 'sources' field must contain a markdown-formatted list of all sources used, with clickable, working links.
 `,
 });
 
