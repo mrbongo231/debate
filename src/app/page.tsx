@@ -1,81 +1,70 @@
+
 'use client';
 
-import { useState, useEffect } from 'react';
-import { SpeechGenerator } from '@/components/eloquent-engine/speech-generator';
-import { PracticeTimer } from '@/components/eloquent-engine/practice-timer';
-import { SavedPrompts } from '@/components/eloquent-engine/saved-prompts';
-import { useLocalStorage } from '@/hooks/use-local-storage';
-import type { SavedOutline } from '@/types';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { History, Timer } from 'lucide-react';
+import Link from 'next/link';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Wand2, Zap, MoveRight } from 'lucide-react';
 
-export default function Home() {
-  const [savedOutlines, setSavedOutlines] = useLocalStorage<SavedOutline[]>('eloquent-engine-outlines', []);
-  const [activeTopic, setActiveTopic] = useState<string>('');
-  const [isClient, setIsClient] = useState(false);
-
-  useEffect(() => {
-    setIsClient(true);
-  }, []);
-
-
-  const handleSave = (data: { topic: string; outline: string }) => {
-    const newOutline: SavedOutline = {
-      id: crypto.randomUUID(),
-      createdAt: new Date().toISOString(),
-      ...data,
-    };
-    setSavedOutlines(prev => [newOutline, ...prev]);
-  };
-
-  const handleLoadTopic = (topic: string) => {
-    setActiveTopic(topic);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
-  
-  const handleDeleteOutline = (id: string) => {
-    setSavedOutlines(prev => prev.filter(o => o.id !== id));
-  };
-
-  if (!isClient) {
-    return null;
-  }
-
+export default function HomePage() {
   return (
-    <div className="space-y-12 my-8">
-      <div className="text-center animate-fade-in-up">
-        <h1 className="text-4xl font-extrabold tracking-tight lg:text-5xl font-headline bg-clip-text text-transparent bg-gradient-to-r from-primary to-secondary">
-          Impromptu Outline Generator
+    <div className="relative overflow-hidden my-8">
+      {/* Background decorative elements */}
+      <div className="absolute -top-10 -left-48 w-96 h-96 bg-primary/20 rounded-full filter blur-3xl opacity-30 animate-blob"></div>
+      <div className="absolute -bottom-20 -right-48 w-96 h-96 bg-secondary/20 rounded-full filter blur-3xl opacity-30 animate-blob animation-delay-200"></div>
+
+      <div className="text-center animate-fade-in-up relative z-10">
+        <h1 className="text-5xl md:text-7xl font-extrabold tracking-tight font-headline bg-clip-text text-transparent bg-gradient-to-r from-primary via-secondary to-primary">
+          Unleash Your Voice
         </h1>
-        <p className="mt-4 text-lg text-muted-foreground">
-          Craft and practice championship-level speeches.
+        <p className="mt-6 max-w-2xl mx-auto text-lg md:text-xl text-muted-foreground">
+          Master the art of public speaking with powerful AI tools designed for both spontaneous brilliance and deep, persuasive arguments.
         </p>
       </div>
 
-      <SpeechGenerator onSave={handleSave} activeTopic={activeTopic} />
-
-      <Tabs defaultValue="history" className="w-full animate-fade-in-up animation-delay-400">
-        <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="history">
-            <History className="mr-2" />
-            History
-          </TabsTrigger>
-          <TabsTrigger value="timer">
-            <Timer className="mr-2" />
-            Practice Timer
-          </TabsTrigger>
-        </TabsList>
-        <TabsContent value="history" className="mt-6">
-          <SavedPrompts 
-            savedOutlines={savedOutlines} 
-            onLoad={handleLoadTopic}
-            onDelete={handleDeleteOutline}
-          />
-        </TabsContent>
-        <TabsContent value="timer" className="mt-6">
-          <PracticeTimer />
-        </TabsContent>
-      </Tabs>
+      <div className="mt-16 grid grid-cols-1 md:grid-cols-2 gap-8 relative z-10">
+        <Card className="border-border/40 hover:border-primary/80 transition-all duration-300 transform hover:-translate-y-2 animate-fade-in-up animation-delay-200">
+          <CardHeader>
+            <div className="flex items-center gap-4">
+              <div className="p-3 bg-primary/10 border border-primary/20 rounded-lg">
+                <Zap className="h-6 w-6 text-primary" />
+              </div>
+              <CardTitle className="text-2xl font-bold">Impromptu Outline</CardTitle>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <CardDescription className="text-base">
+              Generate structured, impactful outlines from any topic or quote in seconds. Perfect for quick thinking and clear delivery.
+            </CardDescription>
+            <Button asChild className="mt-6 w-full" variant="outline">
+              <Link href="/impromptu">
+                Start Creating <MoveRight className="ml-2" />
+              </Link>
+            </Button>
+          </CardContent>
+        </Card>
+        
+        <Card className="border-border/40 hover:border-secondary/80 transition-all duration-300 transform hover:-translate-y-2 animate-fade-in-up animation-delay-400">
+          <CardHeader>
+            <div className="flex items-center gap-4">
+              <div className="p-3 bg-secondary/10 border border-secondary/20 rounded-lg">
+                <Wand2 className="h-6 w-6 text-secondary" />
+              </div>
+              <CardTitle className="text-2xl font-bold">Extemp AI</CardTitle>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <CardDescription className="text-base">
+                Craft championship-level extemporaneous speeches with creative hooks, sourced evidence, and memorization summaries.
+            </CardDescription>
+            <Button asChild className="mt-6 w-full bg-gradient-to-r from-primary to-secondary text-white">
+              <Link href="/extemp">
+                Generate Full Speech <MoveRight className="ml-2" />
+              </Link>
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 }
