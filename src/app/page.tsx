@@ -93,7 +93,7 @@ export default function HomePage() {
                         <p className="text-sm text-muted-foreground w-56">Generate quick, structured outlines from a single topic.</p>
                      </div>
                     <div className="flex flex-col items-center gap-2 text-center animate-fade-in-up animation-delay-300">
-                        <Button asChild className="w-56" size="lg">
+                        <Button asChild className="w-56" variant="outline" size="lg">
                             <Link href="/extemp">
                                 <Wand2 className="mr-2" />
                                 Extemp AI
