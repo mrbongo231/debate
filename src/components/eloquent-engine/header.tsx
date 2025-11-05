@@ -2,7 +2,7 @@
 'use client';
 
 import Link from 'next/link';
-import { Mic, Wand2, Menu, Moon, Sun, Home } from 'lucide-react';
+import { Mic, Wand2, Menu, Moon, Sun } from 'lucide-react';
 import { useTheme } from 'next-themes';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
@@ -26,12 +26,6 @@ export function Header() {
             </span>
           </Link>
           <nav className="flex items-center gap-4 text-sm">
-             <Link
-                href="/"
-                className="transition-colors hover:text-foreground/80 text-foreground/60"
-              >
-                Home
-              </Link>
             {navItems.map((item) => (
               <Link
                 key={item.href}
@@ -62,12 +56,6 @@ export function Header() {
                 </Link>
                 <div className="my-4 h-[calc(100vh-8rem)] pb-10 pl-6">
                   <div className="flex flex-col space-y-3">
-                     <Link
-                        href="/"
-                        className="text-foreground"
-                      >
-                        Home
-                      </Link>
                     {navItems.map((item) => (
                       <Link
                         key={item.href}
