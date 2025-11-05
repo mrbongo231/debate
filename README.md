@@ -1,4 +1,4 @@
-# Firebase Studio
+# Vibe Coded 100 ai
 
 This is a NextJS starter in Firebase Studio.
 
