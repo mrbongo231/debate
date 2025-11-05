@@ -1,3 +1,4 @@
+
 import type {NextConfig} from 'next';
 
 const nextConfig: NextConfig = {
@@ -40,10 +41,6 @@ const nextConfig: NextConfig = {
         '*.github.dev',
       ],
     },
-    allowedDevOrigins: [
-      'https://6000-firebase-studio-1762305063406.cluster-ocv3ypmyqfbqysslgd7zlhmxek.cloudworkstations.dev',
-      '*.github.dev',
-    ],
   },
 };
 

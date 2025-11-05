@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useTransition, useEffect } from 'react';
@@ -17,6 +18,7 @@ import { SavedSpeech } from '@/types';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { PracticeTimer } from '@/components/eloquent-engine/practice-timer';
 import { SavedSpeeches } from '@/components/eloquent-engine/saved-speeches';
+import React from 'react';
 
 const formSchema = z.object({
   topic: z.string().min(1, 'Please enter a topic.'),
@@ -27,10 +29,33 @@ interface GeneratedSpeech {
   sources: string;
 }
 
+// This component will only be rendered on the client.
+function ClientOnlyHistory() {
+  const [savedSpeeches, setSavedSpeeches] = useLocalStorage<SavedSpeech[]>('eloquent-engine-speeches', []);
+
+  const handleDeleteSpeech = (id: string) => {
+    setSavedSpeeches(prev => prev.filter(o => o.id !== id));
+  };
+
+  // Get the onLoad handler from context.
+  const { onLoad } = useSavedSpeechesContext();
+
+  return (
+    <SavedSpeeches
+      savedSpeeches={savedSpeeches}
+      onLoad={onLoad}
+      onDelete={handleDeleteSpeech}
+    />
+  );
+}
+
+// Create a context to pass the onLoad function down.
+const SavedSpeechesContext = React.createContext<{ onLoad: (topic: string) => void }>({ onLoad: () => {} });
+const useSavedSpeechesContext = () => React.useContext(SavedSpeechesContext);
+
 export default function ExtempPage() {
   const [isPending, startTransition] = useTransition();
   const [generatedSpeech, setGeneratedSpeech] = useState<GeneratedSpeech | null>(null);
-  const [savedSpeeches, setSavedSpeeches] = useLocalStorage<SavedSpeech[]>('eloquent-engine-speeches', []);
   const [activeTopic, setActiveTopic] = useState<string>('');
   const [isClient, setIsClient] = useState(false);
   const { toast } = useToast();
@@ -78,18 +103,28 @@ export default function ExtempPage() {
   const handleSave = () => {
     const topic = form.getValues('topic');
     if (topic && generatedSpeech) {
-      const newSpeech: SavedSpeech = {
-        id: crypto.randomUUID(),
-        createdAt: new Date().toISOString(),
-        topic,
-        speech: generatedSpeech.speech,
-        sources: generatedSpeech.sources,
-      };
-      setSavedSpeeches(prev => [newSpeech, ...prev]);
-      toast({
-        title: 'Saved!',
-        description: 'Your extemp speech has been saved to your history.',
-      });
+      try {
+        const key = 'eloquent-engine-speeches';
+        const existing = window.localStorage.getItem(key);
+        const speeches: SavedSpeech[] = existing ? JSON.parse(existing) : [];
+        const newSpeech: SavedSpeech = {
+          id: crypto.randomUUID(),
+          createdAt: new Date().toISOString(),
+          topic,
+          speech: generatedSpeech.speech,
+          sources: generatedSpeech.sources,
+        };
+        const newSpeeches = [newSpeech, ...speeches];
+        window.localStorage.setItem(key, JSON.stringify(newSpeeches));
+        window.dispatchEvent(new Event("local-storage"));
+
+        toast({
+          title: 'Saved!',
+          description: 'Your extemp speech has been saved to your history.',
+        });
+      } catch (error) {
+        console.warn('Failed to save speech:', error);
+      }
     }
   };
 
@@ -97,14 +132,10 @@ export default function ExtempPage() {
     setActiveTopic(topic);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
-  
-  const handleDeleteSpeech = (id: string) => {
-    setSavedSpeeches(prev => prev.filter(o => o.id !== id));
-  };
-  
+
   const renderContent = (content: string) => {
     return content.split('\n').filter(line => line.trim() !== '').map((line, index) => {
-      if (line.match(/^##\s/)) { 
+      if (line.match(/^##\s/)) {
         return <h3 key={index} className="text-2xl font-bold mt-8 mb-4 text-primary">{line.replace(/##\s/, '')}</h3>;
       }
       if (line.match(/^###\s/)) {
@@ -144,11 +175,6 @@ export default function ExtempPage() {
         </ul>
     )
 };
-
-
-  if (!isClient) {
-    return null;
-  }
 
   return (
     <main className="container mx-auto p-4 md:p-6 max-w-4xl">
@@ -251,11 +277,9 @@ export default function ExtempPage() {
             </TabsTrigger>
           </TabsList>
           <TabsContent value="history" className="mt-6">
-            <SavedSpeeches 
-              savedSpeeches={savedSpeeches} 
-              onLoad={handleLoadTopic}
-              onDelete={handleDeleteSpeech}
-            />
+             <SavedSpeechesContext.Provider value={{ onLoad: handleLoadTopic }}>
+                {isClient ? <ClientOnlyHistory /> : <div>Loading history...</div>}
+            </SavedSpeechesContext.Provider>
           </TabsContent>
           <TabsContent value="timer" className="mt-6">
             <PracticeTimer />
