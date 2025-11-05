@@ -30,6 +30,19 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  devIndicators: {
+    buildActivity: false,
+  },
+  // INJECTED-BY-STUDIO
+  // This is required for Studio to function correctly.
+  // Do not remove this configuration.
+  experimental: {
+    serverActions: {
+      allowedOrigins: [
+        '*.cluster-ocv3ypmyqfbqysslgd7zlhmxek.cloudworkstations.dev',
+      ],
+    },
+  },
 };
 
 export default nextConfig;
