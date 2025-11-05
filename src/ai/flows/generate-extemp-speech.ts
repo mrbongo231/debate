@@ -1,7 +1,7 @@
 'use server';
 
 /**
- * @fileOverview Generates a full extemporaneous speech with a creative, comparative hook.
+ * @fileOverview Generates a full extemporaneous speech with a creative, comparative hook and sources.
  *
  * - generateExtempSpeech - A function that generates a full speech.
  * - GenerateExtempSpeechInput - The input type for the generateExtempSpeech function.
@@ -25,6 +25,9 @@ const GenerateExtempSpeechOutputSchema = z.object({
   speech: z
     .string()
     .describe('A full, well-structured extemporaneous speech with a creative introduction, main points, and conclusion.'),
+  sources: z
+    .string()
+    .describe('A markdown-formatted string of credible sources used for the data and examples in the speech, with clickable links.'),
 });
 
 export type GenerateExtempSpeechOutput = z.infer<
@@ -43,7 +46,7 @@ const prompt = ai.definePrompt({
   output: {schema: GenerateExtempSpeechOutputSchema},
   prompt: `You are a legendary extemporaneous speaking coach, known for producing national champions. Your specialty is crafting speeches that are not only perfectly structured but also unforgettable due to their creative and insightful introductions.
 
-Your task is to generate a full 7-minute extemporaneous speech based on the provided topic.
+Your task is to generate a full 7-minute extemporaneous speech based on the provided topic. For all data and examples, you MUST provide credible, clickable markdown links to your sources.
 
 Topic: {{{topic}}}
 
@@ -59,19 +62,19 @@ The speech MUST follow this structure and include these specific elements:
 ## Main Point 1: [Descriptive Title] (Approx. 2:00)
 -   **Claim:** State your first argument clearly.
 -   **Warrant:** Explain the logic behind your claim.
--   **Data/Example:** Provide a specific, credible piece of evidence (statistic, historical example, expert testimony) to support your claim.
+-   **Data/Example:** Provide a specific, credible piece of evidence (statistic, historical example, expert testimony) to support your claim. You MUST cite your source.
 
 ## Main Point 2: [Descriptive Title] (Approx. 2:00)
 -   **Claim:** State your second argument, building on the first.
 -   **Warrant:** Explain the logic.
--   **Data/Example:** Provide a different kind of evidence than in the first point. If you used a statistic, maybe use an anecdote or a case study here.
+-   **Data/Example:** Provide a different kind of evidence than in the first point. If you used a statistic, maybe use an anecdote or a case study here. You MUST cite your source.
 
 ## Conclusion (Approx. 1:30)
 1.  **Review:** Briefly summarize your main points in a fresh, impactful way. Do not just list them again.
 2.  **Bookend/Tie-back:** Circle back to the creative hook you used in the introduction. This creates a satisfying, cohesive feel.
 3.  **Final Thought:** End with a powerful, memorable statement that leaves the audience thinking. This could be a call to action, a profound thought, or a vision for the future.
 
-Your output must be a single Markdown-formatted string containing the full speech.
+The final output will be two fields. The 'speech' field should be a single Markdown-formatted string containing the full speech. The 'sources' field must contain a markdown-formatted list of all sources used, with clickable links.
 `,
 });
 

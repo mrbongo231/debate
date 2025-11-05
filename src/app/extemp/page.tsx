@@ -8,33 +8,59 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Form, FormControl, FormField, FormItem, FormMessage } from '@/components/ui/form';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
-import { Loader2, Wand2 } from 'lucide-react';
+import { Loader2, Wand2, Save, History, Timer } from 'lucide-react';
 import { getExtempSpeechAction } from '@/app/actions';
 import { useToast } from '@/hooks/use-toast';
 import { Skeleton } from '@/components/ui/skeleton';
+import { useLocalStorage } from '@/hooks/use-local-storage';
+import { SavedSpeech } from '@/types';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { PracticeTimer } from '@/components/eloquent-engine/practice-timer';
+import { SavedSpeeches } from '@/components/eloquent-engine/saved-speeches';
 
 const formSchema = z.object({
   topic: z.string().min(1, 'Please enter a topic.'),
 });
 
+interface GeneratedSpeech {
+  speech: string;
+  sources: string;
+}
+
 export default function ExtempPage() {
   const [isPending, startTransition] = useTransition();
-  const [generatedSpeech, setGeneratedSpeech] = useState<string | null>(null);
+  const [generatedSpeech, setGeneratedSpeech] = useState<GeneratedSpeech | null>(null);
+  const [savedSpeeches, setSavedSpeeches] = useLocalStorage<SavedSpeech[]>('eloquent-engine-speeches', []);
+  const [activeTopic, setActiveTopic] = useState<string>('');
+  const [isClient, setIsClient] = useState(false);
   const { toast } = useToast();
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      topic: '',
+      topic: activeTopic || '',
     },
   });
+
+  useEffect(() => {
+    if (isClient) {
+      form.reset({ topic: activeTopic || '' });
+      if (activeTopic) {
+        setGeneratedSpeech(null);
+      }
+    }
+  }, [activeTopic, form, isClient]);
 
   const onSubmit = (values: z.infer<typeof formSchema>) => {
     setGeneratedSpeech(null);
     startTransition(async () => {
       const result = await getExtempSpeechAction({ topic: values.topic });
       if (result.success && result.data) {
-        setGeneratedSpeech(result.data.speech);
+        setGeneratedSpeech(result.data);
         toast({
           title: 'Speech Generated!',
           description: 'Your new extemporaneous speech is ready.',
@@ -48,14 +74,44 @@ export default function ExtempPage() {
       }
     });
   };
+
+  const handleSave = () => {
+    const topic = form.getValues('topic');
+    if (topic && generatedSpeech) {
+      const newSpeech: SavedSpeech = {
+        id: crypto.randomUUID(),
+        createdAt: new Date().toISOString(),
+        topic,
+        speech: generatedSpeech.speech,
+        sources: generatedSpeech.sources,
+      };
+      setSavedSpeeches(prev => [newSpeech, ...prev]);
+      toast({
+        title: 'Saved!',
+        description: 'Your extemp speech has been saved to your history.',
+      });
+    }
+  };
+
+  const handleLoadTopic = (topic: string) => {
+    setActiveTopic(topic);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
   
-  const renderSpeech = (speech: string) => {
-    return speech.split('\n').filter(line => line.trim() !== '').map((line, index) => {
+  const handleDeleteSpeech = (id: string) => {
+    setSavedSpeeches(prev => prev.filter(o => o.id !== id));
+  };
+  
+  const renderContent = (content: string) => {
+    return content.split('\n').filter(line => line.trim() !== '').map((line, index) => {
       if (line.match(/^##\s/)) { 
         return <h3 key={index} className="text-2xl font-bold mt-8 mb-4 text-primary">{line.replace(/##\s/, '')}</h3>;
       }
       if (line.match(/^###\s/)) {
         return <h4 key={index} className="text-xl font-semibold mt-6 mb-3 text-secondary">{line.replace(/###\s/, '')}</h4>;
+      }
+      if (line.match(/^\d\.\s/)) { // Numbered list for intro/conclusion points
+        return <p key={index} className="mb-2 text-foreground/90 leading-relaxed"><span className="font-semibold">{line.substring(0, 2)}</span>{line.substring(2)}</p>;
       }
       if (line.startsWith('- ')) {
         return <li key={index} className="ml-6 list-disc text-foreground/80 leading-relaxed">{line.substring(2)}</li>;
@@ -64,18 +120,53 @@ export default function ExtempPage() {
     });
   };
 
+  const renderSources = (sources: string) => {
+    const sourceLinks = sources.match(/\[.*?\]\(.*?\)/g) || [];
+    if (sourceLinks.length === 0) return <p className="text-foreground/80">No sources were provided.</p>;
+
+    return (
+        <ul className="list-disc ml-6 space-y-2">
+            {sources.split('\n').filter(line => line.trim().startsWith('* ') || line.trim().startsWith('- ')).map((line, index) => {
+                const linkMatch = line.match(/\[(.*?)\]\((.*?)\)/);
+                if (linkMatch) {
+                    const text = linkMatch[1];
+                    const url = linkMatch[2];
+                    return (
+                        <li key={index} className="text-foreground/80 leading-relaxed">
+                            <a href={url} target="_blank" rel="noopener noreferrer" className="text-primary underline hover:text-primary/80 transition-colors">
+                                {text}
+                            </a>
+                        </li>
+                    )
+                }
+                return null;
+            })}
+        </ul>
+    )
+};
+
+
+  if (!isClient) {
+    return null;
+  }
+
   return (
-    <div className="space-y-8 my-8">
+    <div className="space-y-12 my-8">
       <div className="text-center animate-fade-in-up">
         <h1 className="text-4xl font-extrabold tracking-tight lg:text-5xl font-headline bg-clip-text text-transparent bg-gradient-to-r from-primary to-secondary">
           Extemp AI
         </h1>
         <p className="mt-4 text-lg text-muted-foreground">
-          Enter a topic to generate a championship-level extemporaneous speech with a creative, comparative hook.
+          Generate and perfect a championship-level extemporaneous speech.
         </p>
       </div>
+      
       <Card className="border-border/40 animate-fade-in-up animation-delay-200">
-        <CardContent className="pt-6">
+        <CardHeader>
+            <CardTitle className="text-xl">Create Your Speech</CardTitle>
+            <CardDescription>Enter a topic to generate a masterpiece with creative hooks and sources.</CardDescription>
+        </CardHeader>
+        <CardContent>
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
               <FormField
@@ -131,11 +222,44 @@ export default function ExtempPage() {
           </CardHeader>
           <CardContent>
             <div className="prose dark:prose-invert max-w-none">
-              {renderSpeech(generatedSpeech)}
+              {renderContent(generatedSpeech.speech)}
+            </div>
+            <div className="mt-12 pt-6 border-t border-border">
+                <h3 className="text-2xl font-bold mb-4 text-primary">Sources</h3>
+                {renderSources(generatedSpeech.sources)}
             </div>
           </CardContent>
+           <CardFooter>
+            <Button variant="outline" onClick={handleSave}>
+              <Save className="mr-2 h-4 w-4" />
+              Save Speech to History
+            </Button>
+          </CardFooter>
         </Card>
       )}
+      
+       <Tabs defaultValue="history" className="w-full animate-fade-in-up animation-delay-400">
+        <TabsList className="grid w-full grid-cols-2">
+          <TabsTrigger value="history">
+            <History className="mr-2" />
+            History
+          </TabsTrigger>
+          <TabsTrigger value="timer">
+            <Timer className="mr-2" />
+            Practice Timer
+          </TabsTrigger>
+        </TabsList>
+        <TabsContent value="history" className="mt-6">
+          <SavedSpeeches 
+            savedSpeeches={savedSpeeches} 
+            onLoad={handleLoadTopic}
+            onDelete={handleDeleteSpeech}
+          />
+        </TabsContent>
+        <TabsContent value="timer" className="mt-6">
+          <PracticeTimer />
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }

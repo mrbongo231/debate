@@ -1,7 +1,7 @@
 'use server';
 
 import { generateSpeechOutline, GenerateSpeechOutlineInput } from '@/ai/flows/generate-speech-outline';
-import { generateExtempSpeech, GenerateExtempSpeechInput } from '@/ai/flows/generate-extemp-speech';
+import { generateExtempSpeech, GenerateExtempSpeechInput, GenerateExtempSpeechOutput } from '@/ai/flows/generate-extemp-speech';
 
 export async function getSpeechOutlineAction(input: GenerateSpeechOutlineInput) {
   try {
@@ -13,7 +13,7 @@ export async function getSpeechOutlineAction(input: GenerateSpeechOutlineInput) 
   }
 }
 
-export async function getExtempSpeechAction(input: GenerateExtempSpeechInput) {
+export async function getExtempSpeechAction(input: GenerateExtempSpeechInput): Promise<{ success: boolean, data?: GenerateExtempSpeechOutput, error?: string}> {
     try {
       const result = await generateExtempSpeech(input);
       return { success: true, data: result };

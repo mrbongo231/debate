@@ -4,3 +4,11 @@ export interface SavedOutline {
   outline: string;
   createdAt: string;
 }
+
+export interface SavedSpeech {
+  id: string;
+  topic: string;
+  speech: string;
+  sources: string;
+  createdAt: string;
+}
