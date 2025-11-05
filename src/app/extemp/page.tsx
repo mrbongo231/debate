@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState, useTransition, useEffect } from 'react';
+import React, { useState, useTransition, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -18,7 +18,6 @@ import { SavedSpeech } from '@/types';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { PracticeTimer } from '@/components/eloquent-engine/practice-timer';
 import { SavedSpeeches } from '@/components/eloquent-engine/saved-speeches';
-import React from 'react';
 
 const formSchema = z.object({
   topic: z.string().min(1, 'Please enter a topic.'),
@@ -29,6 +28,10 @@ interface GeneratedSpeech {
   sources: string;
 }
 
+// Create a context to pass the onLoad function down.
+const SavedSpeechesContext = React.createContext<{ onLoad: (topic: string) => void }>({ onLoad: () => {} });
+export const useSavedSpeechesContext = () => React.useContext(SavedSpeechesContext);
+
 // This component will only be rendered on the client.
 function ClientOnlyHistory() {
   const [savedSpeeches, setSavedSpeeches] = useLocalStorage<SavedSpeech[]>('eloquent-engine-speeches', []);
@@ -37,7 +40,6 @@ function ClientOnlyHistory() {
     setSavedSpeeches(prev => prev.filter(o => o.id !== id));
   };
 
-  // Get the onLoad handler from context.
   const { onLoad } = useSavedSpeechesContext();
 
   return (
@@ -48,10 +50,6 @@ function ClientOnlyHistory() {
     />
   );
 }
-
-// Create a context to pass the onLoad function down.
-const SavedSpeechesContext = React.createContext<{ onLoad: (topic: string) => void }>({ onLoad: () => {} });
-const useSavedSpeechesContext = () => React.useContext(SavedSpeechesContext);
 
 export default function ExtempPage() {
   const [isPending, startTransition] = useTransition();
@@ -81,6 +79,7 @@ export default function ExtempPage() {
   }, [activeTopic, form, isClient]);
 
   const onSubmit = (values: z.infer<typeof formSchema>) => {
+    setActiveTopic(values.topic);
     setGeneratedSpeech(null);
     startTransition(async () => {
       const result = await getExtempSpeechAction({ topic: values.topic });
@@ -101,16 +100,14 @@ export default function ExtempPage() {
   };
 
   const handleSave = () => {
-    const topic = form.getValues('topic');
-    if (topic && generatedSpeech) {
-      try {
+    if (activeTopic && generatedSpeech) {
         const key = 'eloquent-engine-speeches';
         const existing = window.localStorage.getItem(key);
         const speeches: SavedSpeech[] = existing ? JSON.parse(existing) : [];
         const newSpeech: SavedSpeech = {
           id: crypto.randomUUID(),
           createdAt: new Date().toISOString(),
-          topic,
+          topic: activeTopic,
           speech: generatedSpeech.speech,
           sources: generatedSpeech.sources,
         };
@@ -122,9 +119,6 @@ export default function ExtempPage() {
           title: 'Saved!',
           description: 'Your extemp speech has been saved to your history.',
         });
-      } catch (error) {
-        console.warn('Failed to save speech:', error);
-      }
     }
   };
 
@@ -244,7 +238,7 @@ export default function ExtempPage() {
             <CardHeader>
               <CardTitle className="text-3xl font-headline">Your Generated Speech</CardTitle>
               <CardDescription className="pt-2 break-words text-base">
-                For topic: "{form.getValues('topic')}"
+                For topic: "{activeTopic}"
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -257,7 +251,7 @@ export default function ExtempPage() {
               </div>
             </CardContent>
              <CardFooter>
-              <Button variant="outline" onClick={handleSave}>
+              <Button variant="outline" onClick={handleSave} disabled={!activeTopic || !generatedSpeech}>
                 <Save className="mr-2 h-4 w-4" />
                 Save Speech to History
               </Button>
@@ -278,7 +272,19 @@ export default function ExtempPage() {
           </TabsList>
           <TabsContent value="history" className="mt-6">
              <SavedSpeechesContext.Provider value={{ onLoad: handleLoadTopic }}>
-                {isClient ? <ClientOnlyHistory /> : <div>Loading history...</div>}
+                {isClient ? <ClientOnlyHistory /> : (
+                  <Card>
+                    <CardHeader>
+                      <Skeleton className="h-8 w-1/2" />
+                      <Skeleton className="h-4 w-3/4 mt-2" />
+                    </CardHeader>
+                    <CardContent className="space-y-4 pt-6">
+                      <Skeleton className="h-12 w-full" />
+                      <Skeleton className="h-12 w-full" />
+                      <Skeleton className="h-12 w-full" />
+                    </CardContent>
+                  </Card>
+                )}
             </SavedSpeechesContext.Provider>
           </TabsContent>
           <TabsContent value="timer" className="mt-6">

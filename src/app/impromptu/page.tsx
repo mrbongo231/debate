@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { SpeechGenerator } from '@/components/eloquent-engine/speech-generator';
 import { PracticeTimer } from '@/components/eloquent-engine/practice-timer';
 import { SavedPrompts } from '@/components/eloquent-engine/saved-prompts';
@@ -9,6 +9,12 @@ import { useLocalStorage } from '@/hooks/use-local-storage';
 import type { SavedOutline } from '@/types';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { History, Timer } from 'lucide-react';
+import { Skeleton } from '@/components/ui/skeleton';
+
+
+// Context to pass down the onLoad handler to the client-only component
+const SavedPromptsContext = React.createContext<{ onLoad: (topic: string) => void }>({ onLoad: () => {} });
+export const useSavedPromptsContext = () => React.useContext(SavedPromptsContext);
 
 function ClientOnlyHistory() {
   const [savedOutlines, setSavedOutlines] = useLocalStorage<SavedOutline[]>('eloquent-engine-outlines', []);
@@ -17,10 +23,6 @@ function ClientOnlyHistory() {
     setSavedOutlines(prev => prev.filter(o => o.id !== id));
   };
   
-  // The onLoad handler is passed up to the parent `ImpromptuPage`
-  // so we will get it from props. This component only handles
-  // fetching and deleting from localStorage. The parent still
-  // controls the state for the generator.
   const { onLoad } = useSavedPromptsContext();
 
   return (
@@ -32,10 +34,6 @@ function ClientOnlyHistory() {
   );
 }
 
-// Context to pass down the onLoad handler to the client-only component
-const SavedPromptsContext = React.createContext<{ onLoad: (topic: string) => void }>({ onLoad: () => {} });
-const useSavedPromptsContext = () => React.useContext(SavedPromptsContext);
-
 
 export default function ImpromptuPage() {
   const [activeTopic, setActiveTopic] = useState<string>('');
@@ -46,9 +44,6 @@ export default function ImpromptuPage() {
   }, []);
 
   const handleSave = (data: { topic: string; outline: string }) => {
-    // We need to access localStorage for this, so we find the key and update it manually
-    // This is a bit of a hack, but it avoids re-rendering the whole page
-    // when we just want to save something.
     try {
         const key = 'eloquent-engine-outlines';
         const existing = window.localStorage.getItem(key);
@@ -60,7 +55,6 @@ export default function ImpromptuPage() {
         };
         const newOutlines = [newOutline, ...outlines];
         window.localStorage.setItem(key, JSON.stringify(newOutlines));
-        // Manually dispatch an event to notify other components (like our history tab)
         window.dispatchEvent(new Event("local-storage"));
       } catch (error) {
         console.warn(`Error setting localStorage key “eloquent-engine-outlines”:`, error);
@@ -99,7 +93,19 @@ export default function ImpromptuPage() {
           </TabsList>
           <TabsContent value="history" className="mt-6">
             <SavedPromptsContext.Provider value={{ onLoad: handleLoadTopic }}>
-                {isClient ? <ClientOnlyHistory /> : <div>Loading history...</div>}
+                {isClient ? <ClientOnlyHistory /> : (
+                  <Card>
+                    <CardHeader>
+                      <Skeleton className="h-8 w-1/2" />
+                      <Skeleton className="h-4 w-3/4 mt-2" />
+                    </CardHeader>
+                    <CardContent className="space-y-4 pt-6">
+                      <Skeleton className="h-12 w-full" />
+                      <Skeleton className="h-12 w-full" />
+                      <Skeleton className="h-12 w-full" />
+                    </CardContent>
+                  </Card>
+                )}
             </SavedPromptsContext.Provider>
           </TabsContent>
           <TabsContent value="timer" className="mt-6">
