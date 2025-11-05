@@ -68,7 +68,7 @@ export default function HomePage() {
         <p className="mt-6 max-w-2xl mx-auto text-lg md:text-xl text-muted-foreground">
           Master the art of public speaking with powerful AI tools designed for both spontaneous brilliance and deep, persuasive arguments.
         </p>
-        <div className="mt-12 relative flex justify-center items-center h-14">
+        <div className="mt-12 relative flex justify-center items-center h-24">
             <Button 
                 size="lg"
                 className={cn(
@@ -82,19 +82,25 @@ export default function HomePage() {
             </Button>
             
             {showToolButtons && (
-                <div className="absolute inset-0 flex justify-center items-center gap-4">
-                     <Button asChild className="w-56 animate-fade-in-up animation-delay-100" variant="outline" size="lg">
-                        <Link href="/impromptu">
-                            <Zap className="mr-2" />
-                            Impromptu Outline
-                        </Link>
-                    </Button>
-                    <Button asChild className="w-56 animate-fade-in-up animation-delay-300" size="lg">
-                        <Link href="/extemp">
-                            <Wand2 className="mr-2" />
-                            Extemp AI
-                        </Link>
-                    </Button>
+                <div className="absolute inset-0 flex justify-center items-start gap-8">
+                     <div className="flex flex-col items-center gap-2 text-center animate-fade-in-up animation-delay-100">
+                        <Button asChild className="w-56" variant="outline" size="lg">
+                            <Link href="/impromptu">
+                                <Zap className="mr-2" />
+                                Impromptu Outline
+                            </Link>
+                        </Button>
+                        <p className="text-sm text-muted-foreground w-56">Generate quick, structured outlines from a single topic.</p>
+                     </div>
+                    <div className="flex flex-col items-center gap-2 text-center animate-fade-in-up animation-delay-300">
+                        <Button asChild className="w-56" size="lg">
+                            <Link href="/extemp">
+                                <Wand2 className="mr-2" />
+                                Extemp AI
+                            </Link>
+                        </Button>
+                        <p className="text-sm text-muted-foreground w-56">Craft full speeches with creative hooks and sourced evidence.</p>
+                    </div>
                 </div>
             )}
         </div>
