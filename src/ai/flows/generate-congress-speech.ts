@@ -47,23 +47,24 @@ const prompt = ai.definePrompt({
 
 **CRITICAL INSTRUCTIONS:**
 1.  **Speech Persona:** Write in a confident, articulate, and highly persuasive tone. The analysis must be sharp, the logic clear, and the rhetoric powerful.
-2.  **Speech Structure (3-Minute Target):**
+2.  **Sourcing Requirement:** You MUST incorporate at least one piece of evidence from a credible, real, and recent (last 1-2 years) source (e.g., major news outlet, academic journal, reputable think tank). You must mention the source in the speech (e.g., "As the New York Times reported...").
+3.  **Speech Structure (3-Minute Target):**
     *   **Introduction (Approx. 45 seconds):**
-        *   **Creative Hook:** Start with a powerful, unexpected analogy, a vivid historical parallel, a literary reference, or a gripping anecdote. This must grab the chamber's attention immediately.
+        *   **Creative Hook:** Start with a powerful, unexpected analogy, a vivid and relevant historical parallel, a poignant literary reference, or a gripping anecdote that is directly tied to the core conflict of the legislation. This must grab the chamber's attention immediately and feel clever.
         *   **Link:** Smoothly connect the hook to the specific legislation being debated.
-        *   **Position Statement:** Clearly state your stance (affirmation/negation) and briefly introduce your core arguments.
+        *   **Position Statement:** Clearly state your stance (e.g., "And that is why I stand in firm affirmation of this bill") and briefly introduce your core arguments.
     *   **Point 1 (Approx. 1 minute):**
         *   **Claim:** State your first major argument.
         *   **Warrant:** Explain the logic. Why is this claim true?
-        *   **Impact:** Explain the significance. Why does this argument matter? What are the real-world consequences (solvency, harms, economic impact, etc.)? Use strong evidence or logical reasoning.
+        *   **Impact & Evidence:** Explain the significance. Why does this argument matter? Use your cited source here to provide strong evidence (statistic, finding, expert quote) and explain the real-world consequences (solvency, harms, economic impact, etc.).
     *   **Point 2 (Approx. 1 minute):**
         *   **Claim:** State your second, distinct argument.
         *   **Warrant:** Explain the logic.
         *   **Impact:** Explain the significance, providing a different angle of impact than the first point.
-    *   **Conclusion (Approx. '15-20' seconds):**
+    *   **Conclusion (Approx. 15-20 seconds):**
         *   **Summary:** Briefly and powerfully restate your main arguments.
-        *   **Final Thought:** End with a memorable, impactful statement that crystallizes your position and urges the chamber to vote with you. Do not say "I urge you to vote...".
-3.  **Content Generation:**
+        *   **Final Thought & Call to Action:** End with a memorable, impactful statement that crystallizes your position and makes it unequivocally clear whether the chamber must vote to pass or fail the legislation.
+4.  **Content Generation:**
     *   **Title:** Based on the legislation's text, create a short, official-sounding title (e.g., "A Bill to Enhance Cybersecurity Infrastructure").
     *   **Pro/Con Points:** After writing the speech, generate 3-4 distinct, bulleted talking points for both the pro and con sides. These should be concise arguments that could be used by other speakers.
 
