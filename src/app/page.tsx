@@ -5,7 +5,8 @@ import Link from 'next/link';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Wand2, Zap, MoveRight, Layers, Bot, Clock, Sparkles } from 'lucide-react';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useTransition } from 'react';
+import { cn } from '@/lib/utils';
 
 const features = [
     {
@@ -32,6 +33,8 @@ const features = [
 
 export default function HomePage() {
   const [opacity, setOpacity] = useState(1);
+  const [showToolButtons, setShowToolButtons] = useState(false);
+  const [isPending, startTransition] = useTransition();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -46,6 +49,12 @@ export default function HomePage() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  const handleStartClick = () => {
+    startTransition(() => {
+        setShowToolButtons(true);
+    });
+  }
+
   return (
     <div className="relative overflow-hidden my-8">
       {/* Background decorative elements */}
@@ -59,50 +68,36 @@ export default function HomePage() {
         <p className="mt-6 max-w-2xl mx-auto text-lg md:text-xl text-muted-foreground">
           Master the art of public speaking with powerful AI tools designed for both spontaneous brilliance and deep, persuasive arguments.
         </p>
-      </div>
-
-      <div className="mt-16 grid grid-cols-1 md:grid-cols-2 gap-8 relative z-10 animate-fade-in-up">
-        <Card className="border-border/40 hover:border-primary/80 transition-all duration-300 transform hover:-translate-y-2">
-          <CardHeader>
-            <div className="flex items-center gap-4">
-              <div className="p-3 bg-primary/10 border border-primary/20 rounded-lg">
-                <Zap className="h-6 w-6 text-primary" />
-              </div>
-              <CardTitle className="text-2xl font-bold">Impromptu Outline</CardTitle>
-            </div>
-          </CardHeader>
-          <CardContent>
-            <CardDescription className="text-base">
-              Generate structured, impactful outlines from any topic or quote in seconds. Perfect for quick thinking and clear delivery.
-            </CardDescription>
-            <Button asChild className="mt-6 w-full" variant="outline">
-              <Link href="/impromptu">
-                Start Creating <MoveRight className="ml-2" />
-              </Link>
+        <div className="mt-12 relative flex justify-center items-center h-14">
+            <Button 
+                size="lg"
+                className={cn(
+                    "w-64 bg-gradient-to-r from-primary to-secondary text-white text-lg transition-all duration-500 ease-in-out",
+                    showToolButtons ? 'opacity-0 scale-90' : 'opacity-100 scale-100'
+                )}
+                onClick={handleStartClick}
+                disabled={isPending}
+            >
+                Start Winning
             </Button>
-          </CardContent>
-        </Card>
-        
-        <Card className="border-border/40 hover:border-secondary/80 transition-all duration-300 transform hover:-translate-y-2">
-          <CardHeader>
-            <div className="flex items-center gap-4">
-              <div className="p-3 bg-secondary/10 border border-secondary/20 rounded-lg">
-                <Wand2 className="h-6 w-6 text-secondary" />
-              </div>
-              <CardTitle className="text-2xl font-bold">Extemp AI</CardTitle>
-            </div>
-          </CardHeader>
-          <CardContent>
-            <CardDescription className="text-base">
-                Craft championship-level extemporaneous speeches with creative hooks, sourced evidence, and memorization summaries.
-            </CardDescription>
-            <Button asChild className="mt-6 w-full bg-gradient-to-r from-primary to-secondary text-white">
-              <Link href="/extemp">
-                Generate Full Speech <MoveRight className="ml-2" />
-              </Link>
-            </Button>
-          </CardContent>
-        </Card>
+            
+            {showToolButtons && (
+                <div className="absolute inset-0 flex justify-center items-center gap-4">
+                     <Button asChild className="w-56 animate-fade-in-up animation-delay-100" variant="outline" size="lg">
+                        <Link href="/impromptu">
+                            <Zap className="mr-2" />
+                            Impromptu Outline
+                        </Link>
+                    </Button>
+                    <Button asChild className="w-56 animate-fade-in-up animation-delay-300" size="lg">
+                        <Link href="/extemp">
+                            <Wand2 className="mr-2" />
+                            Extemp AI
+                        </Link>
+                    </Button>
+                </div>
+            )}
+        </div>
       </div>
 
       <section className="mt-32 mb-16 relative z-10 animate-fade-in-up animation-delay-400">
