@@ -8,7 +8,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
-import { Loader2, Wand2, Mic, CheckCircle, XCircle } from 'lucide-react';
+import { Loader2, Wand2, Mic, CheckCircle, XCircle, Copy } from 'lucide-react';
 import { getCongressSpeechAction } from '@/app/actions';
 import { useToast } from '@/hooks/use-toast';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -23,7 +23,7 @@ interface GeneratedCongressContent {
   title: string;
   speech: string;
   proPoints: string;
-  conPoints: string;
+  conPoints:string;
 }
 
 export default function CongressPage() {
@@ -58,14 +58,20 @@ export default function CongressPage() {
       }
     });
   };
+  
+  const handleCopy = (text: string) => {
+    navigator.clipboard.writeText(text);
+    toast({
+      title: "Copied to clipboard!",
+    });
+  };
 
   const renderSpeech = (content: string) => {
-    return content.split('\n').filter(line => line.trim() !== '').map((line, index) => {
-      if (line.match(/^(introduction|point 1|point 2|conclusion)/i)) { 
-        return <h3 key={index} className="text-xl font-bold mt-6 mb-3 text-primary">{line}</h3>;
-      }
-      return <p key={index} className="mb-4 text-foreground/90 leading-relaxed">{line}</p>;
-    });
+    return (
+        <pre className="text-wrap font-sans text-foreground/90 leading-relaxed">
+            {content}
+        </pre>
+    )
   };
 
   const renderPoints = (points: string) => {
@@ -184,10 +190,18 @@ export default function CongressPage() {
         {generatedContent && !isPending && (
           <Card className="animate-fade-in-up animation-delay-300">
             <CardHeader>
-              <CardTitle className="text-3xl font-headline">{generatedContent.title}</CardTitle>
-              <CardDescription className="pt-2 break-words text-base">
-                A speech in {form.getValues('stance')}
-              </CardDescription>
+                <div className="flex justify-between items-start gap-4">
+                    <div className="flex-1">
+                        <CardTitle className="text-3xl font-headline">{generatedContent.title}</CardTitle>
+                        <CardDescription className="pt-2 break-words text-base">
+                            A speech in {form.getValues('stance')}
+                        </CardDescription>
+                    </div>
+                     <Button variant="ghost" size="icon" onClick={() => handleCopy(generatedContent.speech)}>
+                        <Copy className="h-5 w-5" />
+                        <span className="sr-only">Copy speech</span>
+                    </Button>
+                </div>
             </CardHeader>
             <CardContent>
               <div className="prose dark:prose-invert max-w-none">
