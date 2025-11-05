@@ -71,17 +71,17 @@ const ReviewCard = ({
 
 export function ReviewMarquee() {
   return (
-    <div className="relative flex w-full flex-col items-center justify-center overflow-hidden rounded-lg border bg-background/50 py-20 md:shadow-xl">
+    <div className="relative flex w-full flex-col items-center justify-center overflow-hidden rounded-lg bg-background/50 py-20 md:shadow-xl mt-32 mb-16">
         <h2 className="text-4xl font-extrabold tracking-tight font-headline text-center mb-12">Loved by Champions Nationwide</h2>
         <div className="w-full inline-flex flex-nowrap overflow-hidden [mask-image:_linear-gradient(to_right,transparent_0,_black_128px,_black_calc(100%-128px),transparent_100%)]">
-            <ul className="flex items-center justify-center md:justify-start [&_li]:mx-4 animate-marquee-reverse">
+            <ul className="flex items-center justify-center md:justify-start [&_li]:mx-4 animate-marquee">
                 {reviews.map((review) => (
                     <li key={review.name}>
                         <ReviewCard {...review} />
                     </li>
                 ))}
             </ul>
-             <ul className="flex items-center justify-center md:justify-start [&_li]:mx-4 animate-marquee-reverse" aria-hidden="true">
+             <ul className="flex items-center justify-center md:justify-start [&_li]:mx-4 animate-marquee" aria-hidden="true">
                 {reviews.map((review) => (
                     <li key={review.name}>
                         <ReviewCard {...review} />

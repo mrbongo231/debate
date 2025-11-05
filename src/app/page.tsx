@@ -133,9 +133,6 @@ export default function HomePage() {
          </div>
       </section>
 
-      <section className="mt-32 mb-16 relative z-10">
-        <ReviewMarquee />
-      </section>
     </div>
   );
 }

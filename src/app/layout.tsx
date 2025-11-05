@@ -4,6 +4,7 @@ import { Toaster } from '@/components/ui/toaster';
 import { Inter, Sora } from 'next/font/google';
 import { Header } from '@/components/eloquent-engine/header';
 import { ThemeProvider } from '@/components/theme-provider';
+import { ReviewMarquee } from '@/components/eloquent-engine/review-marquee';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -38,6 +39,7 @@ export default function RootLayout({
           <main className="container mx-auto p-4 md:p-6 max-w-4xl">
             {children}
           </main>
+          <ReviewMarquee />
           <Toaster />
         </ThemeProvider>
       </body>
