@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useTransition } from 'react';
+import { useState, useTransition, useRef } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -29,6 +29,7 @@ interface GeneratedCongressContent {
 export default function CongressPage() {
   const [isPending, startTransition] = useTransition();
   const [generatedContent, setGeneratedContent] = useState<GeneratedCongressContent | null>(null);
+  const speechRef = useRef<HTMLPreElement>(null);
   const { toast } = useToast();
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -59,16 +60,18 @@ export default function CongressPage() {
     });
   };
   
-  const handleCopy = (text: string) => {
-    navigator.clipboard.writeText(text);
-    toast({
-      title: "Copied to clipboard!",
-    });
+  const handleCopy = () => {
+    if (speechRef.current?.textContent) {
+      navigator.clipboard.writeText(speechRef.current.textContent);
+      toast({
+        title: "Copied to clipboard!",
+      });
+    }
   };
 
   const renderSpeech = (content: string) => {
     return (
-        <pre className="text-wrap font-sans text-foreground/90 leading-relaxed">
+        <pre ref={speechRef} className="text-wrap font-sans text-foreground/90 leading-relaxed">
             {content}
         </pre>
     )
@@ -197,7 +200,7 @@ export default function CongressPage() {
                             A speech in {form.getValues('stance')}
                         </CardDescription>
                     </div>
-                     <Button variant="ghost" size="icon" onClick={() => handleCopy(generatedContent.speech)}>
+                     <Button variant="ghost" size="icon" onClick={handleCopy}>
                         <Copy className="h-5 w-5" />
                         <span className="sr-only">Copy speech</span>
                     </Button>
@@ -224,4 +227,3 @@ export default function CongressPage() {
       </div>
     </main>
   );
-}
