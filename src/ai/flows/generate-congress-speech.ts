@@ -64,7 +64,8 @@ const prompt = ai.definePrompt({
     *   **Conclusion (Approx. 15-20 seconds):**
         *   **Summary:** Briefly and powerfully restate your main arguments.
         *   **Final Thought & Call to Action:** End with a memorable, impactful statement that crystallizes your position and makes it unequivocally clear whether the chamber must vote to pass or fail the legislation.
-4.  **Content Generation:**
+4.  **Formatting:** You MUST insert a double line break (an empty line) between the Introduction, Point 1, Point 2, and the Conclusion to create clear visual separation.
+5.  **Content Generation:**
     *   **Title:** Based on the legislation's text, create a short, official-sounding title (e.g., "A Bill to Enhance Cybersecurity Infrastructure").
     *   **Pro/Con Points:** After writing the speech, generate 3-4 distinct, bulleted talking points for both the pro and con sides. These should be concise arguments that could be used by other speakers.
 
