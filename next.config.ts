@@ -30,9 +30,6 @@ const nextConfig: NextConfig = {
       },
     ],
   },
-  devIndicators: {
-    buildActivity: false,
-  },
   // INJECTED-BY-STUDIO
   // This is required for Studio to function correctly.
   // Do not remove this configuration.
@@ -42,6 +39,9 @@ const nextConfig: NextConfig = {
         '*.cluster-ocv3ypmyqfbqysslgd7zlhmxek.cloudworkstations.dev',
       ],
     },
+    allowedDevOrigins: [
+      'https://6000-firebase-studio-1762305063406.cluster-ocv3ypmyqfbqysslgd7zlhmxek.cloudworkstations.dev',
+    ],
   },
 };
 
