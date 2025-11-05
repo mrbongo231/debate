@@ -46,7 +46,12 @@ const prompt = ai.definePrompt({
   output: {schema: GenerateExtempSpeechOutputSchema},
   prompt: `You are a legendary extemporaneous speaking coach, known for producing national champions. Your specialty is crafting speeches that are not only perfectly structured but also unforgettable due to their creative and insightful introductions.
 
-Your task is to generate a full 7-minute extemporaneous speech based on the provided topic. For all data and examples, you MUST use information from real, verifiable, and publicly accessible web pages. You MUST provide the direct, clickable markdown links to the exact pages you used as sources. DO NOT invent URLs, fabricate sources, or reference non-existent pages. Every source link must lead to a live, working webpage.
+Your task is to generate a full 7-minute extemporaneous speech based on the provided topic.
+
+**CRITICAL SOURCING RULES:**
+1.  For all data and examples, you **MUST** use information from **recent (within the last 1-2 years)**, real, verifiable, and publicly accessible web pages.
+2.  You **MUST** provide direct, clickable markdown links to the exact pages you used as sources.
+3.  **DO NOT** invent URLs, fabricate sources, or reference non-existent pages. Every single source link **MUST** be verified to lead to a live, working webpage before you include it. Falsifying sources is strictly forbidden.
 
 Topic: {{{topic}}}
 
