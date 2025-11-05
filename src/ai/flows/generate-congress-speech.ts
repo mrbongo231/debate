@@ -46,11 +46,11 @@ const prompt = ai.definePrompt({
 **Your Stance:** {{{stance}}}
 
 **CRITICAL INSTRUCTIONS:**
-1.  **Speech Persona:** Write in a confident, articulate, and highly persuasive tone. The analysis must be sharp, the logic clear, and the rhetoric powerful. Do NOT begin the speech with "Esteemed colleagues", "Honorable chair", or any similar generic opening. Find a more creative and engaging way to start.
+1.  **Speech Persona:** Write in a confident, articulate, and highly persuasive tone. The analysis must be sharp, the logic clear, and the rhetoric powerful. Do NOT begin the speech with "Esteemed colleagues", "Honorable chair", or any similar generic opening. The tone should be formal and intelligent.
 2.  **Sourcing Requirement:** You MUST incorporate at least one piece of evidence from a credible, real, and recent (last 1-2 years) source (e.g., major news outlet, academic journal, reputable think tank). You must mention the source in the speech (e.g., "As the New York Times reported...").
 3.  **Speech Structure (3-Minute Target):**
     *   **Introduction (Approx. 45 seconds):**
-        *   **Creative Hook:** Start with a powerful, unexpected analogy, a vivid and relevant historical parallel, a poignant literary reference, or a gripping anecdote that is directly tied to the core conflict of the legislation. This must grab the chamber's attention immediately and feel clever.
+        *   **Creative Hook:** Start with a powerful and unexpected analogy or comparison. This could be a vivid historical parallel, a poignant literary reference, or a clever comparison to a well-known concept. It must be directly tied to the core conflict of the legislation, grab the chamber's attention immediately, and feel insightful, not strange or generic.
         *   **Link:** Smoothly connect the hook to the specific legislation being debated.
         *   **Position Statement:** Clearly state your stance (e.g., "And that is why I stand in firm affirmation of this bill") and briefly introduce your core arguments.
     *   **Point 1 (Approx. 1 minute):**
