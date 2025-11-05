@@ -107,6 +107,10 @@ export default {
                 transform: 'translate(0px, 0px) scale(1)',
             },
         },
+        'marquee': {
+            from: { transform: 'translateX(0)' },
+            to: { transform: 'translateX(calc(-100% - var(--gap)))' },
+          },
       },
       animation: {
         'accordion-down': 'accordion-down 0.2s ease-out',
@@ -114,6 +118,7 @@ export default {
         'fade-in': 'fade-in 0.5s ease-out forwards',
         'fade-in-up': 'fade-in-up 0.6s ease-out forwards',
         'blob': 'blob 7s infinite',
+        'marquee': 'marquee var(--duration, 60s) linear infinite',
       },
       animationDelay: {
         '100': '100ms',

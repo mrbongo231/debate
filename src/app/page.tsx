@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Wand2, Zap, MoveRight, Layers, Bot, Clock, Sparkles, BookOpen } from 'lucide-react';
 import { useState, useEffect, useTransition } from 'react';
 import { cn } from '@/lib/utils';
+import { ReviewMarquee } from '@/components/eloquent-engine/review-marquee';
 
 const features = [
     {
@@ -130,6 +131,10 @@ export default function HomePage() {
                 </div>
             ))}
          </div>
+      </section>
+
+      <section className="mt-32 mb-16 relative z-10">
+        <ReviewMarquee />
       </section>
     </div>
   );
