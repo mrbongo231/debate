@@ -151,115 +151,117 @@ export default function ExtempPage() {
   }
 
   return (
-    <div className="space-y-12 my-8">
-      <div className="text-center animate-fade-in-up">
-        <h1 className="text-4xl font-extrabold tracking-tight lg:text-5xl font-headline bg-clip-text text-transparent bg-gradient-to-r from-primary to-secondary">
-          Extemp AI
-        </h1>
-        <p className="mt-4 text-lg text-muted-foreground">
-          Generate and perfect a championship-level extemporaneous speech.
-        </p>
-      </div>
-      
-      <Card className="border-border/40 animate-fade-in-up animation-delay-200">
-        <CardHeader>
-            <CardTitle className="text-xl">Create Your Speech</CardTitle>
-            <CardDescription>Enter a topic to generate a masterpiece with creative hooks and sources.</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-              <FormField
-                control={form.control}
-                name="topic"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormControl>
-                      <Textarea
-                        placeholder="e.g., 'Artificial Intelligence', 'Climate Change', or 'The gig economy'"
-                        rows={3}
-                        className="text-base"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <Button type="submit" disabled={isPending} size="lg" className="w-full md:w-auto bg-gradient-to-r from-primary to-secondary text-white">
-                {isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Wand2 className="mr-2" />}
-                Generate Speech
-              </Button>
-            </form>
-          </Form>
-        </CardContent>
-      </Card>
-
-      {isPending && (
-          <Card className="animate-fade-in">
-              <CardHeader>
-                  <Skeleton className="h-8 w-3/4" />
-                  <Skeleton className="h-4 w-1/2 mt-2" />
-              </CardHeader>
-              <CardContent className="space-y-4 pt-6">
-                  <Skeleton className="h-6 w-1/3" />
-                  <Skeleton className="h-4 w-full" />
-                  <Skeleton className="h-4 w-5/6" />
-                  <Skeleton className="h-6 w-1/3 mt-4" />
-                  <Skeleton className="h-4 w-full" />
-                  <Skeleton className="h-4 w-full" />
-              </CardContent>
-          </Card>
-      )}
-
-      {generatedSpeech && !isPending && (
-        <Card className="animate-fade-in-up animation-delay-300">
+    <main className="container mx-auto p-4 md:p-6 max-w-4xl">
+      <div className="space-y-12 my-8">
+        <div className="text-center animate-fade-in-up">
+          <h1 className="text-4xl font-extrabold tracking-tight lg:text-5xl font-headline bg-clip-text text-transparent bg-gradient-to-r from-primary to-secondary">
+            Extemp AI
+          </h1>
+          <p className="mt-4 text-lg text-muted-foreground">
+            Generate and perfect a championship-level extemporaneous speech.
+          </p>
+        </div>
+        
+        <Card className="border-border/40 animate-fade-in-up animation-delay-200">
           <CardHeader>
-            <CardTitle className="text-3xl font-headline">Your Generated Speech</CardTitle>
-            <CardDescription className="pt-2 break-words text-base">
-              For topic: "{form.getValues('topic')}"
-            </CardDescription>
+              <CardTitle className="text-xl">Create Your Speech</CardTitle>
+              <CardDescription>Enter a topic to generate a masterpiece with creative hooks and sources.</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="prose dark:prose-invert max-w-none">
-              {renderContent(generatedSpeech.speech)}
-            </div>
-            <div className="mt-12 pt-6 border-t border-border">
-                <h3 className="text-2xl font-bold mb-4 text-primary">Sources</h3>
-                {renderSources(generatedSpeech.sources)}
-            </div>
+            <Form {...form}>
+              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+                <FormField
+                  control={form.control}
+                  name="topic"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormControl>
+                        <Textarea
+                          placeholder="e.g., 'Artificial Intelligence', 'Climate Change', or 'The gig economy'"
+                          rows={3}
+                          className="text-base"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <Button type="submit" disabled={isPending} size="lg" className="w-full md:w-auto bg-gradient-to-r from-primary to-secondary text-white">
+                  {isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Wand2 className="mr-2" />}
+                  Generate Speech
+                </Button>
+              </form>
+            </Form>
           </CardContent>
-           <CardFooter>
-            <Button variant="outline" onClick={handleSave}>
-              <Save className="mr-2 h-4 w-4" />
-              Save Speech to History
-            </Button>
-          </CardFooter>
         </Card>
-      )}
-      
-       <Tabs defaultValue="history" className="w-full animate-fade-in-up animation-delay-400">
-        <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="history">
-            <History className="mr-2" />
-            History
-          </TabsTrigger>
-          <TabsTrigger value="timer">
-            <Timer className="mr-2" />
-            Practice Timer
-          </TabsTrigger>
-        </TabsList>
-        <TabsContent value="history" className="mt-6">
-          <SavedSpeeches 
-            savedSpeeches={savedSpeeches} 
-            onLoad={handleLoadTopic}
-            onDelete={handleDeleteSpeech}
-          />
-        </TabsContent>
-        <TabsContent value="timer" className="mt-6">
-          <PracticeTimer />
-        </TabsContent>
-      </Tabs>
-    </div>
+
+        {isPending && (
+            <Card className="animate-fade-in">
+                <CardHeader>
+                    <Skeleton className="h-8 w-3/4" />
+                    <Skeleton className="h-4 w-1/2 mt-2" />
+                </CardHeader>
+                <CardContent className="space-y-4 pt-6">
+                    <Skeleton className="h-6 w-1/3" />
+                    <Skeleton className="h-4 w-full" />
+                    <Skeleton className="h-4 w-5/6" />
+                    <Skeleton className="h-6 w-1/3 mt-4" />
+                    <Skeleton className="h-4 w-full" />
+                    <Skeleton className="h-4 w-full" />
+                </CardContent>
+            </Card>
+        )}
+
+        {generatedSpeech && !isPending && (
+          <Card className="animate-fade-in-up animation-delay-300">
+            <CardHeader>
+              <CardTitle className="text-3xl font-headline">Your Generated Speech</CardTitle>
+              <CardDescription className="pt-2 break-words text-base">
+                For topic: "{form.getValues('topic')}"
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="prose dark:prose-invert max-w-none">
+                {renderContent(generatedSpeech.speech)}
+              </div>
+              <div className="mt-12 pt-6 border-t border-border">
+                  <h3 className="text-2xl font-bold mb-4 text-primary">Sources</h3>
+                  {renderSources(generatedSpeech.sources)}
+              </div>
+            </CardContent>
+             <CardFooter>
+              <Button variant="outline" onClick={handleSave}>
+                <Save className="mr-2 h-4 w-4" />
+                Save Speech to History
+              </Button>
+            </CardFooter>
+          </Card>
+        )}
+        
+         <Tabs defaultValue="history" className="w-full animate-fade-in-up animation-delay-400">
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="history">
+              <History className="mr-2" />
+              History
+            </TabsTrigger>
+            <TabsTrigger value="timer">
+              <Timer className="mr-2" />
+              Practice Timer
+            </TabsTrigger>
+          </TabsList>
+          <TabsContent value="history" className="mt-6">
+            <SavedSpeeches 
+              savedSpeeches={savedSpeeches} 
+              onLoad={handleLoadTopic}
+              onDelete={handleDeleteSpeech}
+            />
+          </TabsContent>
+          <TabsContent value="timer" className="mt-6">
+            <PracticeTimer />
+          </TabsContent>
+        </Tabs>
+      </div>
+    </main>
   );
 }
