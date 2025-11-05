@@ -1,8 +1,7 @@
-
 'use client';
 
 import Link from 'next/link';
-import { Mic, Wand2, Menu, Moon, Sun } from 'lucide-react';
+import { Mic, Wand2, Menu, Moon, Sun, BookOpen } from 'lucide-react';
 import { useTheme } from 'next-themes';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
@@ -13,6 +12,7 @@ export function Header() {
   const navItems = [
     { href: '/impromptu', label: 'Impromptu Outline', icon: Wand2 },
     { href: '/extemp', label: 'Extemp AI', icon: Wand2 },
+    { href: '/congress', label: 'Congress AI', icon: BookOpen },
   ];
 
   return (

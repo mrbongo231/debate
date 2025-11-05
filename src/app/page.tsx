@@ -1,10 +1,9 @@
-
 'use client';
 
 import Link from 'next/link';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Wand2, Zap, MoveRight, Layers, Bot, Clock, Sparkles } from 'lucide-react';
+import { Wand2, Zap, MoveRight, Layers, Bot, Clock, Sparkles, BookOpen } from 'lucide-react';
 import { useState, useEffect, useTransition } from 'react';
 import { cn } from '@/lib/utils';
 
@@ -12,22 +11,22 @@ const features = [
     {
       icon: Layers,
       title: 'Structured Outlines',
-      description: 'Generate clear, compelling outlines from a single word or quote.',
+      description: 'Generate clear, compelling outlines for Impromptu speeches from a single word or quote. Perfect for breaking down complex ideas into manageable points.',
     },
     {
       icon: Bot,
       title: 'Championship-Level Content',
-      description: 'Craft full speeches with creative hooks and sourced evidence.',
+      description: 'Craft full Extemporaneous speeches with creative hooks and sourced evidence, or write perfectly structured affirmative and negative speeches for Congressional Debate.',
     },
     {
       icon: Sparkles,
       title: 'Creative Hooks',
-      description: 'Start your speeches with unique analogies to pop culture and real events.',
+      description: 'Start your speeches with unique analogies to pop culture and real events, grabbing your audience\'s attention from the very first word.',
     },
     {
       icon: Clock,
       title: 'Practice & Refine',
-      description: 'Use the built-in timer and speech history to perfect your delivery.',
+      description: 'Use the built-in timer and speech history to perfect your delivery, track your progress, and master your timing for any event.',
     }
 ]
 
@@ -100,6 +99,15 @@ export default function HomePage() {
                             </Link>
                         </Button>
                         <p className="text-sm text-muted-foreground w-56">Craft a full, championship-level speech complete with creative hooks, sourced evidence, and a memorization summary.</p>
+                    </div>
+                     <div className="flex flex-col items-center gap-2 text-center animate-fade-in-up animation-delay-500">
+                        <Button asChild className="w-56" variant="outline" size="lg">
+                            <Link href="/congress">
+                                <BookOpen className="mr-2" />
+                                Congress AI
+                            </Link>
+                        </Button>
+                        <p className="text-sm text-muted-foreground w-56">Write winning affirmative or negative speeches on any piece of legislation.</p>
                     </div>
                 </div>
             )}
