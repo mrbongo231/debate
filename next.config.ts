@@ -37,10 +37,12 @@ const nextConfig: NextConfig = {
     serverActions: {
       allowedOrigins: [
         '*.cluster-ocv3ypmyqfbqysslgd7zlhmxek.cloudworkstations.dev',
+        '*.github.dev',
       ],
     },
     allowedDevOrigins: [
       'https://6000-firebase-studio-1762305063406.cluster-ocv3ypmyqfbqysslgd7zlhmxek.cloudworkstations.dev',
+      '*.github.dev',
     ],
   },
 };
