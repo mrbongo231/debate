@@ -42,7 +42,16 @@ export default function Home() {
   }
 
   return (
-    <div className="space-y-12">
+    <div className="space-y-12 my-8">
+      <div className="text-center">
+        <h1 className="text-4xl font-extrabold tracking-tight lg:text-5xl font-headline bg-clip-text text-transparent bg-gradient-to-r from-primary to-secondary">
+          Impromptu Outline Generator
+        </h1>
+        <p className="mt-4 text-lg text-muted-foreground">
+          Craft and practice championship-level speeches.
+        </p>
+      </div>
+
       <SpeechGenerator onSave={handleSave} activeTopic={activeTopic} />
 
       <Tabs defaultValue="history" className="w-full">

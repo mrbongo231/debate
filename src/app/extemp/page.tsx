@@ -55,7 +55,7 @@ export default function ExtempPage() {
         return <h3 key={index} className="text-2xl font-bold mt-8 mb-4 text-primary">{line.replace(/##\s/, '')}</h3>;
       }
       if (line.match(/^###\s/)) {
-        return <h4 key={index} className="text-xl font-semibold mt-6 mb-3 text-primary/80">{line.replace(/###\s/, '')}</h4>;
+        return <h4 key={index} className="text-xl font-semibold mt-6 mb-3 text-secondary">{line.replace(/###\s/, '')}</h4>;
       }
       if (line.startsWith('- ')) {
         return <li key={index} className="ml-6 list-disc text-foreground/80 leading-relaxed">{line.substring(2)}</li>;
@@ -65,13 +65,17 @@ export default function ExtempPage() {
   };
 
   return (
-    <div className="space-y-8">
-      <Card className="bg-card/50 border-border/50">
-        <CardHeader>
-          <CardTitle className="text-3xl">Extemp AI</CardTitle>
-          <CardDescription>Enter a topic to generate a championship-level extemporaneous speech with a creative, comparative hook.</CardDescription>
-        </CardHeader>
-        <CardContent>
+    <div className="space-y-8 my-8">
+      <div className="text-center">
+        <h1 className="text-4xl font-extrabold tracking-tight lg:text-5xl font-headline bg-clip-text text-transparent bg-gradient-to-r from-primary to-secondary">
+          Extemp AI
+        </h1>
+        <p className="mt-4 text-lg text-muted-foreground">
+          Enter a topic to generate a championship-level extemporaneous speech with a creative, comparative hook.
+        </p>
+      </div>
+      <Card className="border-border/40">
+        <CardContent className="pt-6">
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
               <FormField
@@ -91,7 +95,7 @@ export default function ExtempPage() {
                   </FormItem>
                 )}
               />
-              <Button type="submit" disabled={isPending} size="lg">
+              <Button type="submit" disabled={isPending} size="lg" className="w-full md:w-auto bg-gradient-to-r from-primary to-secondary text-white hover:opacity-90 transition-opacity">
                 {isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Wand2 className="mr-2" />}
                 Generate Speech
               </Button>
@@ -120,13 +124,13 @@ export default function ExtempPage() {
       {generatedSpeech && !isPending && (
         <Card>
           <CardHeader>
-            <CardTitle className="text-3xl">Your Generated Speech</CardTitle>
+            <CardTitle className="text-3xl font-headline">Your Generated Speech</CardTitle>
             <CardDescription className="pt-2 break-words text-base">
               For topic: "{form.getValues('topic')}"
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="prose prose-invert max-w-none">
+            <div className="prose dark:prose-invert max-w-none">
               {renderSpeech(generatedSpeech)}
             </div>
           </CardContent>

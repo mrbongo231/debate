@@ -86,7 +86,7 @@ export function SpeechGenerator({ onSave, activeTopic }: SpeechGeneratorProps) {
         return <h3 key={index} className="text-2xl font-bold mt-8 mb-4 text-primary">{line.replace(/##\s/, '')}</h3>;
       }
       if (line.match(/^###\s/)) {
-        return <h4 key={index} className="text-xl font-semibold mt-6 mb-3 text-primary/80">{line.replace(/###\s/, '')}</h4>;
+        return <h4 key={index} className="text-xl font-semibold mt-6 mb-3 text-secondary">{line.replace(/###\s/, '')}</h4>;
       }
       if (line.startsWith('- ')) {
         return <li key={index} className="ml-6 list-disc text-foreground/80 leading-relaxed">{line.substring(2)}</li>;
@@ -97,9 +97,9 @@ export function SpeechGenerator({ onSave, activeTopic }: SpeechGeneratorProps) {
 
   return (
     <div className="space-y-8">
-      <Card className="bg-card/50 border-border/50">
+      <Card className="border-border/40">
         <CardHeader>
-          <CardTitle className="text-3xl">Create Your Speech</CardTitle>
+          <CardTitle className="text-xl">Create Your Speech</CardTitle>
           <CardDescription>Enter a topic, quote, or idea to generate a masterpiece.</CardDescription>
         </CardHeader>
         <CardContent>
@@ -122,7 +122,7 @@ export function SpeechGenerator({ onSave, activeTopic }: SpeechGeneratorProps) {
                   </FormItem>
                 )}
               />
-              <Button type="submit" disabled={isPending} size="lg">
+              <Button type="submit" disabled={isPending} size="lg" className="w-full md:w-auto bg-gradient-to-r from-primary to-secondary text-white hover:opacity-90 transition-opacity">
                 {isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Wand2 className="mr-2" />}
                 Generate Outline
               </Button>
@@ -151,13 +151,13 @@ export function SpeechGenerator({ onSave, activeTopic }: SpeechGeneratorProps) {
       {generatedOutline && !isPending && (
         <Card>
           <CardHeader>
-            <CardTitle className="text-3xl">Your Generated Outline</CardTitle>
+            <CardTitle className="text-3xl font-headline">Your Generated Outline</CardTitle>
             <CardDescription className="pt-2 break-words text-base">
               For topic: "{form.getValues('topic')}"
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="prose prose-invert max-w-none">
+            <div className="prose dark:prose-invert max-w-none">
               {renderOutline(generatedOutline)}
             </div>
           </CardContent>
