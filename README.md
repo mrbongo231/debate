@@ -15,7 +15,7 @@ GitHub Codespaces provides a complete, cloud-based development environment direc
 3.  Go to the **"Codespaces"** tab.
 4.  Click **"Create codespace on main"**.
 
-GitHub will automatically set up the environment. This may take a few minutes.
+GitHub will automatically set up the environment, including all necessary API keys. This may take a few minutes.
 
 ### 2. Installing Dependencies
 
@@ -27,27 +27,7 @@ If for any reason it does not, you can run the installation manually by typing t
 npm install
 ```
 
-### 3. Setting Up Environment Variables
-
-The AI features of this application are powered by Google's Gemini models through Genkit. To enable them, you need to provide an API key.
-
-1.  **Get a Gemini API Key:**
-    *   Visit [Google AI Studio](https://aistudio.google.com/).
-    *   Click on **"Get API key"** and create a new key.
-
-2.  **Create the Environment File:**
-    *   In the Codespaces file explorer on the left, create a new file in the root directory named `.env.local`.
-
-3.  **Add the API Key to the File:**
-    *   Open the newly created `.env.local` file and add the following line, replacing `YOUR_API_KEY_HERE` with the key you just generated:
-
-    ```
-    GEMINI_API_KEY=YOUR_API_KEY_HERE
-    ```
-
-    The Genkit integration in this project is configured to automatically load this variable.
-
-### 4. Running the Application
+### 3. Running the Application
 
 Now you are ready to start the development server. Run the following command in the terminal:
 
