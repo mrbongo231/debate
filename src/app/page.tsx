@@ -56,7 +56,7 @@ export default function HomePage() {
   }
 
   return (
-    <div className="relative overflow-hidden my-8">
+    <div className="relative overflow-hidden">
       {/* Background decorative elements */}
       <div className="absolute -top-10 -left-48 w-96 h-96 bg-primary/20 rounded-full filter blur-3xl opacity-30 animate-blob"></div>
       <div className="absolute -bottom-20 -right-48 w-96 h-96 bg-secondary/20 rounded-full filter blur-3xl opacity-30 animate-blob animation-delay-200"></div>
@@ -115,23 +115,25 @@ export default function HomePage() {
         </div>
       </div>
 
-      <section className="mt-32 mb-16 relative z-10 animate-fade-in-up animation-delay-400">
-         <div className="text-center">
-            <h2 className="text-4xl font-extrabold tracking-tight font-headline">Powerful Features, Effortless Delivery</h2>
-            <p className="mt-4 max-w-2xl mx-auto text-lg text-muted-foreground">Everything you need to go from idea to standing ovation.</p>
-         </div>
-         <div className="mt-16 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-            {features.map((feature, index) => (
-                <div key={index} className="text-center p-6 border border-border/20 rounded-xl bg-card/50 hover:bg-card/80 hover:-translate-y-2 transition-transform duration-300">
-                    <div className="inline-block p-4 bg-primary/10 border border-primary/20 rounded-full mb-4">
-                        <feature.icon className="h-8 w-8 text-primary" />
-                    </div>
-                    <h3 className="text-xl font-bold mb-2">{feature.title}</h3>
-                    <p className="text-muted-foreground">{feature.description}</p>
-                </div>
-            ))}
-         </div>
-      </section>
+      <main className="container mx-auto p-4 md:p-6 max-w-4xl">
+        <section className="mt-32 mb-16 relative z-10 animate-fade-in-up animation-delay-400">
+          <div className="text-center">
+              <h2 className="text-4xl font-extrabold tracking-tight font-headline">Powerful Features, Effortless Delivery</h2>
+              <p className="mt-4 max-w-2xl mx-auto text-lg text-muted-foreground">Everything you need to go from idea to standing ovation.</p>
+          </div>
+          <div className="mt-16 grid grid-cols-1 md:grid-cols-2 gap-8">
+              {features.map((feature, index) => (
+                  <div key={index} className="text-center p-6 border border-border/20 rounded-xl bg-card/50 hover:bg-card/80 hover:-translate-y-2 transition-transform duration-300">
+                      <div className="inline-block p-4 bg-primary/10 border border-primary/20 rounded-full mb-4">
+                          <feature.icon className="h-8 w-8 text-primary" />
+                      </div>
+                      <h3 className="text-xl font-bold mb-2">{feature.title}</h3>
+                      <p className="text-muted-foreground">{feature.description}</p>
+                  </div>
+              ))}
+          </div>
+        </section>
+      </main>
 
     </div>
   );
