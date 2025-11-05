@@ -27,6 +27,11 @@ export function SpeechGenerator({ onSave, activeTopic }: SpeechGeneratorProps) {
   const [isPending, startTransition] = useTransition();
   const [generatedOutline, setGeneratedOutline] = useState<string | null>(null);
   const { toast } = useToast();
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -36,11 +41,13 @@ export function SpeechGenerator({ onSave, activeTopic }: SpeechGeneratorProps) {
   });
 
   useEffect(() => {
-    form.reset({ topic: activeTopic || '' });
-    if (activeTopic) {
-        setGeneratedOutline(null);
+    if (isClient) {
+      form.reset({ topic: activeTopic || '' });
+      if (activeTopic) {
+          setGeneratedOutline(null);
+      }
     }
-  }, [activeTopic, form]);
+  }, [activeTopic, form, isClient]);
 
   const onSubmit = (values: z.infer<typeof formSchema>) => {
     setGeneratedOutline(null);
