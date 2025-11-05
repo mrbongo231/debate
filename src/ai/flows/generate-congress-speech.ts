@@ -50,7 +50,7 @@ const prompt = ai.definePrompt({
 2.  **Sourcing Requirement:** You MUST incorporate at least one piece of evidence from a credible, real, and recent (last 1-2 years) source (e.g., major news outlet, academic journal, reputable think tank). You must mention the source in the speech (e.g., "As the New York Times reported...").
 3.  **Speech Structure (3-Minute Target):**
     *   **Introduction (Approx. 45 seconds):**
-        *   **Creative Hook:** Start with a powerful and unexpected analogy or comparison. This could be a vivid historical parallel, a poignant literary reference, or a clever comparison to a well-known concept. It must be directly tied to the core conflict of the legislation, grab the chamber's attention immediately, and feel insightful, not strange or generic.
+        *   **Creative Hook:** Start with a powerful and attention-grabbing opening. You have the autonomy to choose the best type of hook for maximum impact. This could be a powerful analogy, a striking historical parallel, a poignant anecdote, a startling statistic, or a provocative question. It must be directly tied to the core conflict of the legislation and feel insightful, not generic.
         *   **Link:** Smoothly connect the hook to the specific legislation being debated.
         *   **Position Statement:** Clearly state your stance (e.g., "And that is why I stand in firm affirmation of this bill") and briefly introduce your core arguments.
     *   **Point 1 (Approx. 1 minute):**
