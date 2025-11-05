@@ -49,7 +49,7 @@ export function SavedPrompts({ savedOutlines, onLoad, onDelete }: SavedPromptsPr
               {savedOutlines.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()).map((item) => (
                 <AccordionItem value={item.id} key={item.id} className="border border-border rounded-lg bg-card/50 hover:border-primary/50 transition-all duration-300 hover:scale-[1.02] data-[state=open]:scale-[1.02] data-[state=open]:border-primary/50">
                   <AccordionTrigger className="text-left hover:no-underline px-4 py-3 text-lg">
-                    <span className="truncate pr-4">{item.topic}</span>
+                    <span className="pr-4">{item.topic}</span>
                   </AccordionTrigger>
                   <AccordionContent className="px-4 pb-4">
                     <div className="space-y-4 pt-2 prose prose-invert max-w-none">
