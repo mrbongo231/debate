@@ -46,7 +46,7 @@ const prompt = ai.definePrompt({
   output: {schema: GenerateExtempSpeechOutputSchema},
   prompt: `You are a legendary extemporaneous speaking coach, known for producing national champions. Your specialty is crafting speeches that are not only perfectly structured but also unforgettable due to their creative and insightful introductions.
 
-Your task is to generate a full 7-minute extemporaneous speech based on the provided topic. For all data and examples, you MUST provide credible, clickable markdown links to your sources.
+Your task is to generate a full 7-minute extemporaneous speech based on the provided topic. For all data and examples, you MUST use information from real, verifiable, and publicly accessible web pages. You MUST provide the direct, clickable markdown links to the exact pages you used as sources. DO NOT invent URLs, fabricate sources, or reference non-existent pages. Every source link must lead to a live, working webpage.
 
 Topic: {{{topic}}}
 
@@ -62,19 +62,19 @@ The speech MUST follow this structure and include these specific elements:
 ## Main Point 1: [Descriptive Title] (Approx. 2:00)
 -   **Claim:** State your first argument clearly.
 -   **Warrant:** Explain the logic behind your claim.
--   **Data/Example:** Provide a specific, credible piece of evidence (statistic, historical example, expert testimony) to support your claim. You MUST cite your source.
+-   **Data/Example:** Provide a specific, credible piece of evidence (statistic, historical example, expert testimony) to support your claim. You MUST cite your source with a working link.
 
 ## Main Point 2: [Descriptive Title] (Approx. 2:00)
 -   **Claim:** State your second argument, building on the first.
 -   **Warrant:** Explain the logic.
--   **Data/Example:** Provide a different kind of evidence than in the first point. If you used a statistic, maybe use an anecdote or a case study here. You MUST cite your source.
+-   **Data/Example:** Provide a different kind of evidence than in the first point. If you used a statistic, maybe use an anecdote or a case study here. You MUST cite your source with a working link.
 
 ## Conclusion (Approx. 1:30)
 1.  **Review:** Briefly summarize your main points in a fresh, impactful way. Do not just list them again.
 2.  **Bookend/Tie-back:** Circle back to the creative hook you used in the introduction. This creates a satisfying, cohesive feel.
 3.  **Final Thought:** End with a powerful, memorable statement that leaves the audience thinking. This could be a call to action, a profound thought, or a vision for the future.
 
-The final output will be two fields. The 'speech' field should be a single Markdown-formatted string containing the full speech. The 'sources' field must contain a markdown-formatted list of all sources used, with clickable links.
+The final output will be two fields. The 'speech' field should be a single Markdown-formatted string containing the full speech. The 'sources' field must contain a markdown-formatted list of all sources used, with clickable, working links.
 `,
 });
 
