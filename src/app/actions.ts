@@ -1,0 +1,13 @@
+'use server';
+
+import { generateSpeechOutline, GenerateSpeechOutlineInput } from '@/ai/flows/generate-speech-outline';
+
+export async function getSpeechOutlineAction(input: GenerateSpeechOutlineInput) {
+  try {
+    const result = await generateSpeechOutline(input);
+    return { success: true, data: result };
+  } catch (error) {
+    console.error(error);
+    return { success: false, error: 'Failed to generate speech outline.' };
+  }
+}
