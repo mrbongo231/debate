@@ -46,7 +46,7 @@ const prompt = ai.definePrompt({
 **Your Stance:** {{{stance}}}
 
 **CRITICAL INSTRUCTIONS:**
-1.  **Speech Persona:** Write in a confident, articulate, and highly persuasive tone. The analysis must be sharp, the logic clear, and the rhetoric powerful.
+1.  **Speech Persona:** Write in a confident, articulate, and highly persuasive tone. The analysis must be sharp, the logic clear, and the rhetoric powerful. Do NOT begin the speech with "Esteemed colleagues", "Honorable chair", or any similar generic opening. Find a more creative and engaging way to start.
 2.  **Sourcing Requirement:** You MUST incorporate at least one piece of evidence from a credible, real, and recent (last 1-2 years) source (e.g., major news outlet, academic journal, reputable think tank). You must mention the source in the speech (e.g., "As the New York Times reported...").
 3.  **Speech Structure (3-Minute Target):**
     *   **Introduction (Approx. 45 seconds):**
