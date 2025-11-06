@@ -26,7 +26,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body className={`font-body antialiased transition-colors duration-300 ease-in-out ${inter.variable} ${sora.variable}`}>
         <ThemeProvider
           attribute="class"
