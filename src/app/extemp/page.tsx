@@ -70,13 +70,12 @@ export default function ExtempPage() {
   });
 
   useEffect(() => {
-    if (isClient) {
-      form.reset({ topic: activeTopic || '' });
-      if (activeTopic) {
-        setGeneratedSpeech(null);
-      }
+    form.reset({ topic: activeTopic || '' });
+    if (activeTopic) {
+      setGeneratedSpeech(null);
     }
-  }, [activeTopic, form, isClient]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeTopic]);
 
   const onSubmit = (values: z.infer<typeof formSchema>) => {
     setActiveTopic(values.topic);

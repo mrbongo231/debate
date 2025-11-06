@@ -9,6 +9,7 @@ import { useLocalStorage } from '@/hooks/use-local-storage';
 import type { SavedOutline } from '@/types';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { History, Timer } from 'lucide-react';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 
 

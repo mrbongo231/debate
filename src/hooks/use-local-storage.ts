@@ -2,63 +2,57 @@
 
 import { useState, useEffect, useCallback } from 'react';
 
+function getInitialValue<T>(key: string, initialValue: T): T {
+    // This function should only run on the client.
+    if (typeof window === 'undefined') {
+        return initialValue;
+    }
+    try {
+        const item = window.localStorage.getItem(key);
+        return item ? JSON.parse(item) : initialValue;
+    } catch (error) {
+        console.warn(`Error reading localStorage key “${key}”:`, error);
+        return initialValue;
+    }
+}
+
+
 // A server-safe implementation of useLocalStorage.
 export function useLocalStorage<T>(key: string, initialValue: T): [T, (value: T | ((val: T) => T)) => void] {
-  // State to store our value
-  // Pass initial state function to useState so logic is only executed once
   const [storedValue, setStoredValue] = useState<T>(initialValue);
-
-  // Determine if we are on the client
-  const isClient = typeof window !== 'undefined';
-
+  
+  // We only want to access localStorage on the client side, and only after the component has mounted.
   useEffect(() => {
-    if (!isClient) {
-      return;
-    }
-    try {
-      // Get from local storage by key
-      const item = window.localStorage.getItem(key);
-      // Parse stored json or if none return initialValue
-      setStoredValue(item ? JSON.parse(item) : initialValue);
-    } catch (error) {
-      // If error also return initialValue
-      console.warn(`Error reading localStorage key “${key}”:`, error);
-      setStoredValue(initialValue);
-    }
-  }, [isClient, key, initialValue]);
-
+    setStoredValue(getInitialValue(key, initialValue));
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [key]);
 
   const setValue = (value: T | ((val: T) => T)) => {
-    if (!isClient) {
-      console.warn(`Tried to set localStorage key “${key}” even though no window was found`);
-      return;
-    }
-    try {
-      // Allow value to be a function so we have same API as useState
-      const valueToStore = value instanceof Function ? value(storedValue) : value;
-      // Save state
-      setStoredValue(valueToStore);
-      // Save to local storage
-      window.localStorage.setItem(key, JSON.stringify(valueToStore));
-      // We dispatch a custom event so every useLocalStorage hook are notified
-      window.dispatchEvent(new Event("local-storage"));
-    } catch (error) {
-      console.warn(`Error setting localStorage key “${key}”:`, error);
+    // The actual update logic
+    const valueToStore = value instanceof Function ? value(storedValue) : value;
+    setStoredValue(valueToStore);
+
+    // This should only run on the client.
+    if (typeof window !== 'undefined') {
+      try {
+        window.localStorage.setItem(key, JSON.stringify(valueToStore));
+        // Dispatch event so other instances of the hook are updated
+        window.dispatchEvent(new Event("local-storage"));
+      } catch (error) {
+         console.warn(`Error setting localStorage key “${key}”:`, error);
+      }
     }
   };
+  
+  const handleStorageChange = useCallback(() => {
+    if (typeof window !== 'undefined') {
+       setStoredValue(getInitialValue(key, initialValue));
+    }
+  }, [key, initialValue]);
+
 
   useEffect(() => {
-    if (isClient) {
-      const handleStorageChange = () => {
-         try {
-            const item = window.localStorage.getItem(key);
-            setStoredValue(item ? JSON.parse(item) : initialValue);
-        } catch (error) {
-            console.warn(`Error reading localStorage key “${key}”:`, error);
-            setStoredValue(initialValue);
-        }
-      };
-
+    if (typeof window !== 'undefined') {
       window.addEventListener("storage", handleStorageChange);
       window.addEventListener("local-storage", handleStorageChange);
 
@@ -68,7 +62,7 @@ export function useLocalStorage<T>(key: string, initialValue: T): [T, (value: T 
       };
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isClient, key, initialValue]);
+  }, [handleStorageChange]);
 
 
   return [storedValue, setValue];
