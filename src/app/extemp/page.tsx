@@ -9,15 +9,12 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Form, FormControl, FormField, FormItem, FormMessage } from '@/components/ui/form';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
-import { Loader2, Wand2, Save, History, Timer } from 'lucide-react';
+import { Loader2, Wand2, Timer } from 'lucide-react';
 import { getExtempSpeechAction } from '@/app/actions';
 import { useToast } from '@/hooks/use-toast';
 import { Skeleton } from '@/components/ui/skeleton';
-import { useLocalStorage } from '@/hooks/use-local-storage';
-import { SavedSpeech } from '@/types';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { PracticeTimer } from '@/components/eloquent-engine/practice-timer';
-import { SavedSpeeches } from '@/components/eloquent-engine/saved-speeches';
 
 const formSchema = z.object({
   topic: z.string().min(1, 'Please enter a topic.'),
@@ -26,64 +23,29 @@ const formSchema = z.object({
 interface GeneratedSpeech {
   speech: string;
   sources: string;
-}
-
-// Create a context to pass the onLoad function down.
-const SavedSpeechesContext = React.createContext<{ onLoad: (topic: string) => void }>({ onLoad: () => {} });
-export const useSavedSpeechesContext = () => React.useContext(SavedSpeechesContext);
-
-// This component will only be rendered on the client.
-function ClientOnlyHistory() {
-  const [savedSpeeches, setSavedSpeeches] = useLocalStorage<SavedSpeech[]>('eloquent-engine-speeches', []);
-
-  const handleDeleteSpeech = (id: string) => {
-    setSavedSpeeches(prev => prev.filter(o => o.id !== id));
-  };
-
-  const { onLoad } = useSavedSpeechesContext();
-
-  return (
-    <SavedSpeeches
-      savedSpeeches={savedSpeeches}
-      onLoad={onLoad}
-      onDelete={handleDeleteSpeech}
-    />
-  );
+  summary: string;
 }
 
 export default function ExtempPage() {
   const [isPending, startTransition] = useTransition();
-  const [generatedSpeech, setGeneratedSpeech] = useState<GeneratedSpeech | null>(null);
+  const [generatedContent, setGeneratedContent] = useState<GeneratedSpeech | null>(null);
   const [activeTopic, setActiveTopic] = useState<string>('');
-  const [isClient, setIsClient] = useState(false);
   const { toast } = useToast();
-
-  useEffect(() => {
-    setIsClient(true);
-  }, []);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      topic: activeTopic || '',
+      topic: '',
     },
   });
 
-  useEffect(() => {
-    form.reset({ topic: activeTopic || '' });
-    if (activeTopic) {
-      setGeneratedSpeech(null);
-    }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeTopic]);
-
   const onSubmit = (values: z.infer<typeof formSchema>) => {
     setActiveTopic(values.topic);
-    setGeneratedSpeech(null);
+    setGeneratedContent(null);
     startTransition(async () => {
       const result = await getExtempSpeechAction({ topic: values.topic });
       if (result.success && result.data) {
-        setGeneratedSpeech(result.data);
+        setGeneratedContent(result.data);
         toast({
           title: 'Speech Generated!',
           description: 'Your new extemporaneous speech is ready.',
@@ -96,34 +58,6 @@ export default function ExtempPage() {
         });
       }
     });
-  };
-
-  const handleSave = () => {
-    if (activeTopic && generatedSpeech) {
-        const key = 'eloquent-engine-speeches';
-        const existing = window.localStorage.getItem(key);
-        const speeches: SavedSpeech[] = existing ? JSON.parse(existing) : [];
-        const newSpeech: SavedSpeech = {
-          id: crypto.randomUUID(),
-          createdAt: new Date().toISOString(),
-          topic: activeTopic,
-          speech: generatedSpeech.speech,
-          sources: generatedSpeech.sources,
-        };
-        const newSpeeches = [newSpeech, ...speeches];
-        window.localStorage.setItem(key, JSON.stringify(newSpeeches));
-        window.dispatchEvent(new Event("local-storage"));
-
-        toast({
-          title: 'Saved!',
-          description: 'Your extemp speech has been saved to your history.',
-        });
-    }
-  };
-
-  const handleLoadTopic = (topic: string) => {
-    setActiveTopic(topic);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const renderContent = (content: string) => {
@@ -167,7 +101,20 @@ export default function ExtempPage() {
             })}
         </ul>
     )
-};
+  };
+
+  const renderSummary = (summary: string) => {
+    return (
+      <ul className="space-y-2">
+        {summary.split('\n').filter(line => line.trim().startsWith('- ')).map((line, index) => (
+          <li key={index} className="text-foreground/80 leading-relaxed flex">
+            <span className="font-semibold w-32 shrink-0">{line.substring(2, line.indexOf(':') + 1)}</span>
+            <span>{line.substring(line.indexOf(':') + 2)}</span>
+          </li>
+        ))}
+      </ul>
+    );
+  }
 
   return (
     <main className="container mx-auto p-4 md:p-6 max-w-4xl">
@@ -232,64 +179,43 @@ export default function ExtempPage() {
             </Card>
         )}
 
-        {generatedSpeech && !isPending && (
-          <Card className="animate-fade-in-up animation-delay-300">
-            <CardHeader>
-              <CardTitle className="text-3xl font-headline">Your Generated Speech</CardTitle>
-              <CardDescription className="pt-2 break-words text-base">
-                For topic: "{activeTopic}"
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="prose dark:prose-invert max-w-none">
-                {renderContent(generatedSpeech.speech)}
-              </div>
-              <div className="mt-12 pt-6 border-t border-border">
-                  <h3 className="text-2xl font-bold mb-4 text-primary">Sources</h3>
-                  {renderSources(generatedSpeech.sources)}
-              </div>
-            </CardContent>
-             <CardFooter>
-              <Button variant="outline" onClick={handleSave} disabled={!activeTopic || !generatedSpeech}>
-                <Save className="mr-2 h-4 w-4" />
-                Save Speech to History
-              </Button>
-            </CardFooter>
-          </Card>
+        {generatedContent && !isPending && (
+          <Tabs defaultValue="speech" className="w-full animate-fade-in-up animation-delay-300">
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-3xl font-headline">Your Generated Speech</CardTitle>
+                <CardDescription className="pt-2 break-words text-base">
+                  For topic: "{activeTopic}"
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <TabsList className="grid w-full grid-cols-3">
+                  <TabsTrigger value="speech">Speech</TabsTrigger>
+                  <TabsTrigger value="summary">Memorization Summary</TabsTrigger>
+                  <TabsTrigger value="sources">Sources</TabsTrigger>
+                </TabsList>
+                <TabsContent value="speech" className="mt-6">
+                  <div className="prose dark:prose-invert max-w-none">
+                    {renderContent(generatedContent.speech)}
+                  </div>
+                </TabsContent>
+                <TabsContent value="summary" className="mt-6">
+                  <div className="prose dark:prose-invert max-w-none">
+                    {renderSummary(generatedContent.summary)}
+                  </div>
+                </TabsContent>
+                <TabsContent value="sources" className="mt-6">
+                    <h3 className="text-2xl font-bold mb-4 text-primary">Sources</h3>
+                    {renderSources(generatedContent.sources)}
+                </TabsContent>
+              </CardContent>
+            </Card>
+          </Tabs>
         )}
         
-         <Tabs defaultValue="history" className="w-full animate-fade-in-up animation-delay-400">
-          <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="history">
-              <History className="mr-2" />
-              History
-            </TabsTrigger>
-            <TabsTrigger value="timer">
-              <Timer className="mr-2" />
-              Practice Timer
-            </TabsTrigger>
-          </TabsList>
-          <TabsContent value="history" className="mt-6">
-             <SavedSpeechesContext.Provider value={{ onLoad: handleLoadTopic }}>
-                {isClient ? <ClientOnlyHistory /> : (
-                  <Card>
-                    <CardHeader>
-                      <Skeleton className="h-8 w-1/2" />
-                      <Skeleton className="h-4 w-3/4 mt-2" />
-                    </CardHeader>
-                    <CardContent className="space-y-4 pt-6">
-                      <Skeleton className="h-12 w-full" />
-                      <Skeleton className="h-12 w-full" />
-                      <Skeleton className="h-12 w-full" />
-                    </CardContent>
-                  </Card>
-                )}
-            </SavedSpeechesContext.Provider>
-          </TabsContent>
-          <TabsContent value="timer" className="mt-6">
-            <PracticeTimer />
-          </TabsContent>
-        </Tabs>
+        <div className="animate-fade-in-up animation-delay-400">
+          <PracticeTimer />
+        </div>
       </div>
     </main>
   );

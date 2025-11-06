@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useTransition, useEffect } from 'react';
@@ -8,46 +9,26 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Form, FormControl, FormField, FormItem, FormMessage } from '@/components/ui/form';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
-import { Loader2, Save, Wand2 } from 'lucide-react';
+import { Loader2, Wand2 } from 'lucide-react';
 import { getSpeechOutlineAction } from '@/app/actions';
 import { useToast } from '@/hooks/use-toast';
 import { Skeleton } from '@/components/ui/skeleton';
-import type { SavedOutline } from '@/types';
 
 const formSchema = z.object({
   topic: z.string().min(1, 'Please enter a topic or quote.'),
 });
 
-interface SpeechGeneratorProps {
-  onSave: (outline: Omit<SavedOutline, 'id' | 'createdAt'>) => void;
-  activeTopic?: string;
-}
-
-export function SpeechGenerator({ onSave, activeTopic }: SpeechGeneratorProps) {
+export function SpeechGenerator() {
   const [isPending, startTransition] = useTransition();
   const [generatedOutline, setGeneratedOutline] = useState<string | null>(null);
   const { toast } = useToast();
-  const [isClient, setIsClient] = useState(false);
-
-  useEffect(() => {
-    setIsClient(true);
-  }, []);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      topic: activeTopic || '',
+      topic: '',
     },
   });
-
-  useEffect(() => {
-    if (isClient) {
-      form.reset({ topic: activeTopic || '' });
-      if (activeTopic) {
-          setGeneratedOutline(null);
-      }
-    }
-  }, [activeTopic, form, isClient]);
 
   const onSubmit = (values: z.infer<typeof formSchema>) => {
     setGeneratedOutline(null);
@@ -69,17 +50,6 @@ export function SpeechGenerator({ onSave, activeTopic }: SpeechGeneratorProps) {
     });
   };
 
-  const handleSave = () => {
-    const topic = form.getValues('topic');
-    if (topic && generatedOutline) {
-      onSave({ topic, outline: generatedOutline });
-      toast({
-        title: 'Saved!',
-        description: 'Your speech outline has been saved to your history.',
-      });
-    }
-  };
-  
   const renderOutline = (outline: string) => {
     return outline.split('\n').filter(line => line.trim() !== '').map((line, index) => {
       if (line.match(/^##\s/)) { 
@@ -161,12 +131,6 @@ export function SpeechGenerator({ onSave, activeTopic }: SpeechGeneratorProps) {
               {renderOutline(generatedOutline)}
             </div>
           </CardContent>
-          <CardFooter>
-            <Button variant="outline" onClick={handleSave}>
-              <Save className="mr-2 h-4 w-4" />
-              Save Outline to History
-            </Button>
-          </CardFooter>
         </Card>
       )}
     </div>

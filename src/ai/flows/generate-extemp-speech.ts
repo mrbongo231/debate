@@ -58,7 +58,7 @@ Your task is to generate a full 7-minute extemporaneous speech, a list of source
 3.  **Output Structure:** The final output will be three JSON fields: 'speech', 'sources', and 'summary'.
     - The 'speech' field should contain **ONLY** the text of the speech. You can mention the source (e.g., "according to a report by..."), but **DO NOT** include the markdown link in the speech text itself.
     - The 'sources' field must contain a markdown-formatted list of all sources used (e.g., "* [Source Title](https://example.com)"). Every piece of data or specific example in the speech must have a corresponding entry in this 'sources' list.
-    - The 'summary' field must contain a brief, bullet-point summary of the core arguments for easy memorization.
+    - The 'summary' field must contain a brief, bullet-point summary of the core arguments for easy memorization. The format should be: "- Hook: [description]\n- Question: [question]\n- Answer/Thesis: [answer]\n- Main Point 1: [summary]\n- Main Point 2: [summary]\n- Conclusion: [takeaway]".
 
 Topic: {{{topic}}}
 
@@ -88,14 +88,6 @@ The speech MUST follow this structure and include these specific elements:
 
 ---
 Finally, after creating the speech and sources, generate the summary.
-
-**Memorization Summary:**
-- **Hook:** (Briefly describe the creative hook)
-- **Question:** (State the central question)
-- **Answer/Thesis:** (State your main answer)
-- **Main Point 1:** (Summarize the claim and evidence)
-- **Main Point 2:** (Summarize the claim and evidence)
-- **Conclusion:** (Briefly state the final takeaway)
 `,
 });
 
