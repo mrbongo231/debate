@@ -15,7 +15,8 @@ export function PracticeTimer() {
   
   useEffect(() => {
     setIsClient(true);
-  }, []);
+    setSeconds(initialMinutes * 60);
+  }, [initialMinutes]);
 
   const reset = useCallback(() => {
     setIsActive(false);
@@ -26,7 +27,6 @@ export function PracticeTimer() {
     const newMinutes = parseInt(inputMinutes, 10);
     if (!isNaN(newMinutes) && newMinutes > 0 && newMinutes <= 999) {
       setInitialMinutes(newMinutes);
-      setSeconds(newMinutes * 60);
       setIsActive(false);
     }
   }
@@ -53,6 +53,24 @@ export function PracticeTimer() {
     return `${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
   };
 
+  if (!isClient) {
+    return (
+        <Card>
+            <CardHeader>
+                <CardTitle className="text-3xl">Practice Timer</CardTitle>
+                <CardDescription>Time your delivery to perfection.</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+                <div className="text-center bg-muted/20 p-8 rounded-lg border border-border">
+                    <p className="text-8xl font-bold font-mono text-primary">
+                        {formatTime(initialMinutes * 60)}
+                    </p>
+                </div>
+            </CardContent>
+        </Card>
+    );
+  }
+
   return (
     <Card>
       <CardHeader>
@@ -61,8 +79,8 @@ export function PracticeTimer() {
       </CardHeader>
       <CardContent className="space-y-6">
         <div className="text-center bg-muted/20 p-8 rounded-lg border border-border">
-            <p className="text-8xl font-bold font-mono text-primary" suppressHydrationWarning>
-                {isClient ? formatTime(seconds) : '00:00'}
+            <p className="text-8xl font-bold font-mono text-primary">
+                {formatTime(seconds)}
             </p>
         </div>
         <div className="flex justify-center gap-4">
