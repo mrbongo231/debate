@@ -45,21 +45,17 @@ export default function ImpromptuPage() {
   }, []);
 
   const handleSave = (data: { topic: string; outline: string }) => {
-    try {
-        const key = 'eloquent-engine-outlines';
-        const existing = window.localStorage.getItem(key);
-        const outlines: SavedOutline[] = existing ? JSON.parse(existing) : [];
-        const newOutline: SavedOutline = {
-          id: crypto.randomUUID(),
-          createdAt: new Date().toISOString(),
-          ...data,
-        };
-        const newOutlines = [newOutline, ...outlines];
-        window.localStorage.setItem(key, JSON.stringify(newOutlines));
-        window.dispatchEvent(new Event("local-storage"));
-      } catch (error) {
-        console.warn(`Error setting localStorage key “eloquent-engine-outlines”:`, error);
-      }
+      const key = 'eloquent-engine-outlines';
+      const existing = window.localStorage.getItem(key);
+      const outlines: SavedOutline[] = existing ? JSON.parse(existing) : [];
+      const newOutline: SavedOutline = {
+        id: crypto.randomUUID(),
+        createdAt: new Date().toISOString(),
+        ...data,
+      };
+      const newOutlines = [newOutline, ...outlines];
+      window.localStorage.setItem(key, JSON.stringify(newOutlines));
+      window.dispatchEvent(new Event("local-storage"));
   };
 
   const handleLoadTopic = (topic: string) => {

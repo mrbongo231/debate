@@ -2,8 +2,8 @@
 
 import { useState, useEffect, useCallback } from 'react';
 
-function getInitialValue<T>(key: string, initialValue: T): T {
-    // This function should only run on the client.
+// This function will only run on the client
+function getStoredValue<T>(key: string, initialValue: T): T {
     if (typeof window === 'undefined') {
         return initialValue;
     }
@@ -16,52 +16,52 @@ function getInitialValue<T>(key: string, initialValue: T): T {
     }
 }
 
-
-// A server-safe implementation of useLocalStorage.
 export function useLocalStorage<T>(key: string, initialValue: T): [T, (value: T | ((val: T) => T)) => void] {
-  const [storedValue, setStoredValue] = useState<T>(initialValue);
+  // The `useState` function is now passed a function, which will only be executed on the client during the initial render.
+  // This prevents `localStorage` access on the server.
+  const [storedValue, setStoredValue] = useState(() => getStoredValue(key, initialValue));
   
-  // We only want to access localStorage on the client side, and only after the component has mounted.
+  // This effect will run whenever the key changes, and it will re-sync the state with localStorage.
   useEffect(() => {
-    setStoredValue(getInitialValue(key, initialValue));
+    setStoredValue(getStoredValue(key, initialValue));
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [key]);
 
   const setValue = (value: T | ((val: T) => T)) => {
-    // The actual update logic
-    const valueToStore = value instanceof Function ? value(storedValue) : value;
-    setStoredValue(valueToStore);
-
-    // This should only run on the client.
-    if (typeof window !== 'undefined') {
-      try {
+    try {
+      const valueToStore = value instanceof Function ? value(storedValue) : value;
+      setStoredValue(valueToStore);
+      if (typeof window !== 'undefined') {
         window.localStorage.setItem(key, JSON.stringify(valueToStore));
-        // Dispatch event so other instances of the hook are updated
-        window.dispatchEvent(new Event("local-storage"));
-      } catch (error) {
-         console.warn(`Error setting localStorage key “${key}”:`, error);
+        // Dispatch a custom event to notify other tabs/windows of the change.
+        window.dispatchEvent(new Event('local-storage'));
       }
+    } catch (error) {
+       console.warn(`Error setting localStorage key “${key}”:`, error);
     }
   };
   
-  const handleStorageChange = useCallback(() => {
-    if (typeof window !== 'undefined') {
-       setStoredValue(getInitialValue(key, initialValue));
-    }
-  }, [key, initialValue]);
-
+  const handleStorageChange = useCallback(
+    (event: StorageEvent | CustomEvent) => {
+      // Check for our custom event, or a storage event from another tab.
+      if ((event as StorageEvent).key && (event as StorageEvent).key !== key) {
+        return;
+      }
+      setStoredValue(getStoredValue(key, initialValue));
+    },
+    [key, initialValue]
+  );
 
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      window.addEventListener("storage", handleStorageChange);
-      window.addEventListener("local-storage", handleStorageChange);
+    // Listen for storage changes from other tabs.
+    window.addEventListener('storage', handleStorageChange);
+    // Listen for storage changes from the same tab (our custom event).
+    window.addEventListener('local-storage', handleStorageChange);
 
-      return () => {
-        window.removeEventListener("storage", handleStorageChange);
-        window.removeEventListener("local-storage", handleStorageChange);
-      };
-    }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+      window.removeEventListener('local-storage', handleStorageChange);
+    };
   }, [handleStorageChange]);
 
 
