@@ -3,6 +3,7 @@
 import { generateSpeechOutline, GenerateSpeechOutlineInput } from '@/ai/flows/generate-speech-outline';
 import { generateExtempSpeech, GenerateExtempSpeechInput, GenerateExtempSpeechOutput } from '@/ai/flows/generate-extemp-speech';
 import { generateCongressSpeech, GenerateCongressSpeechInput, GenerateCongressSpeechOutput } from '@/ai/flows/generate-congress-speech';
+import { generateCards, GenerateCardsInput, GenerateCardsOutput } from '@/ai/flows/generate-cards';
 
 export async function getSpeechOutlineAction(input: GenerateSpeechOutlineInput) {
   try {
@@ -33,3 +34,13 @@ export async function getCongressSpeechAction(input: GenerateCongressSpeechInput
     return { success: false, error: 'Failed to generate Congress speech.' };
   }
 }
+
+export async function getCardsAction(input: GenerateCardsInput): Promise<{ success: boolean, data?: GenerateCardsOutput, error?: string}> {
+    try {
+      const result = await generateCards(input);
+      return { success: true, data: result };
+    } catch (error) {
+      console.error(error);
+      return { success: false, error: 'Failed to generate cards.' };
+    }
+  }

@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Wand2, Zap, MoveRight, Layers, Bot, Clock, Sparkles, BookOpen } from 'lucide-react';
+import { Wand2, Zap, MoveRight, Layers, Bot, Clock, Sparkles, BookOpen, Scissors } from 'lucide-react';
 import { useState, useEffect, useTransition } from 'react';
 import { cn } from '@/lib/utils';
 import { ReviewMarquee } from '@/components/eloquent-engine/review-marquee';
@@ -20,9 +20,9 @@ const features = [
       description: 'Craft full Extemporaneous speeches with creative hooks and sourced evidence, or write perfectly structured affirmative and negative speeches for Congressional Debate.',
     },
     {
-      icon: Sparkles,
-      title: 'Creative Hooks',
-      description: 'Start your speeches with unique analogies to pop culture and real events, grabbing your audience\'s attention from the very first word.',
+      icon: Scissors,
+      title: 'Automated Card Cutting',
+      description: 'Paste any article URL and instantly extract the most important claims, quotes, and impacts into perfectly formatted debate cards.',
     },
     {
       icon: Clock,
@@ -57,7 +57,7 @@ export default function HomePage() {
 
   return (
     <>
-      <main className="container mx-auto p-4 md:p-6 max-w-4xl">
+      <main className="container mx-auto p-4 md:p-6 max-w-5xl">
         <div className="relative overflow-hidden">
           {/* Background decorative elements */}
           <div className="absolute -top-10 -left-48 w-96 h-96 bg-primary/20 rounded-full filter blur-3xl opacity-30 animate-blob"></div>
@@ -84,7 +84,7 @@ export default function HomePage() {
                 </Button>
                 
                 {showToolButtons && (
-                    <div className="absolute inset-0 flex justify-center items-start gap-8">
+                    <div className="absolute inset-0 flex justify-center items-start gap-4">
                          <div className="flex flex-col items-center gap-2 text-center animate-fade-in-up animation-delay-100">
                             <Button asChild className="w-56" variant="outline" size="lg">
                                 <Link href="/impromptu">
@@ -92,7 +92,7 @@ export default function HomePage() {
                                     Impromptu Outline
                                 </Link>
                             </Button>
-                            <p className="text-sm text-muted-foreground w-56">Generate quick, structured outlines from a single topic or quote to kickstart your creativity.</p>
+                            <p className="text-sm text-muted-foreground w-56">Quick, structured outlines to kickstart your creativity.</p>
                          </div>
                         <div className="flex flex-col items-center gap-2 text-center animate-fade-in-up animation-delay-300">
                             <Button asChild className="w-56" variant="outline" size="lg">
@@ -101,7 +101,7 @@ export default function HomePage() {
                                     Extemp AI
                                 </Link>
                             </Button>
-                            <p className="text-sm text-muted-foreground w-56">Craft a full, championship-level speech complete with creative hooks, sourced evidence, and a memorization summary.</p>
+                            <p className="text-sm text-muted-foreground w-56">Full speeches with creative hooks and sourced evidence.</p>
                         </div>
                          <div className="flex flex-col items-center gap-2 text-center animate-fade-in-up animation-delay-500">
                             <Button asChild className="w-56" variant="outline" size="lg">
@@ -110,7 +110,16 @@ export default function HomePage() {
                                     Congress AI
                                 </Link>
                             </Button>
-                            <p className="text-sm text-muted-foreground w-56">Write winning affirmative or negative speeches on any piece of legislation.</p>
+                            <p className="text-sm text-muted-foreground w-56">Winning affirmative or negative speeches on any legislation.</p>
+                        </div>
+                        <div className="flex flex-col items-center gap-2 text-center animate-fade-in-up animation-delay-700">
+                            <Button asChild className="w-56" variant="outline" size="lg">
+                                <Link href="/card-cutting">
+                                    <Scissors className="mr-2" />
+                                    Card Cutting AI
+                                </Link>
+                            </Button>
+                            <p className="text-sm text-muted-foreground w-56">Instantly extract evidence from any article URL.</p>
                         </div>
                     </div>
                 )}
