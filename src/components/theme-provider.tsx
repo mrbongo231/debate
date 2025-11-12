@@ -12,8 +12,11 @@ export function ThemeProvider({ children, ...props }: ThemeProviderProps) {
   }, [])
 
   if (!mounted) {
-    return null
+    // On the server or during hydration, render the children directly
+    // This avoids trying to access localStorage
+    return <>{children}</>
   }
 
+  // Once mounted on the client, render the full provider
   return <NextThemesProvider {...props}>{children}</NextThemesProvider>
 }
