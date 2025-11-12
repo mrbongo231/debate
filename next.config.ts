@@ -36,10 +36,14 @@ const nextConfig: NextConfig = {
   // Do not remove this configuration.
   experimental: {
     serverActions: {
-      allowedOrigins: [
+      allowedForwardedHosts: [
         '*.cluster-ocv3ypmyqfbqysslgd7zlhmxek.cloudworkstations.dev',
         '*.github.dev',
       ],
+      allowedOrigins: [
+        '*.cluster-ocv3ypmyqfbqysslgd7zlhmxek.cloudworkstations.dev',
+        '*.github.dev',
+      ]
     },
   },
 };
