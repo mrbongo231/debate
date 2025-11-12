@@ -1,22 +1,13 @@
 'use server';
 
-import {
-  generateSpeechOutline,
-  GenerateSpeechOutlineInput,
-} from '@/ai/flows/generate-speech-outline';
-import {
-  generateExtempSpeech,
-  GenerateExtempSpeechInput,
-  GenerateExtempSpeechOutput,
-} from '@/ai/flows/generate-extemp-speech';
-import {
-  generateCongressSpeech,
-  GenerateCongressSpeechInput,
-  GenerateCongressSpeechOutput,
-} from '@/ai/flows/generate-congress-speech';
-import { generateCards as generateCardsFlow, GenerateCardsInput, GenerateCardsOutput } from '@/ai/flows/generate-cards';
+import { extractEvidence as extractEvidenceFlow } from '@/ai/flows/extract-evidence-from-article';
+import { generateCards as generateCardsFlow } from '@/ai/flows/generate-cards';
 import { z } from 'zod';
 import type { EvidenceCard as EvidenceCardType, Citation } from '@/lib/definitions';
+import { GenerateSpeechOutlineInput, generateSpeechOutline } from '@/ai/flows/generate-speech-outline';
+import { GenerateExtempSpeechInput, GenerateExtempSpeechOutput, generateExtempSpeech } from '@/ai/flows/generate-extemp-speech';
+import { GenerateCongressSpeechInput, GenerateCongressSpeechOutput, generateCongressSpeech } from '@/ai/flows/generate-congress-speech';
+
 
 export async function getSpeechOutlineAction(input: GenerateSpeechOutlineInput) {
   try {
@@ -51,6 +42,7 @@ export async function getCongressSpeechAction(
     return { success: false, error: 'Failed to generate Congress speech.' };
   }
 }
+
 
 // Schema for URL-based extraction
 const fetchSchema = z.object({
@@ -149,28 +141,20 @@ export async function runExtractEvidence(prevState: ExtractState, formData: Form
         };
     }
 
-    // Note: The original code called a flow `extractEvidenceFlow` which doesn't exist.
-    // We are reusing `generateCardsFlow` but it expects a URL, not text.
-    // This will be a limitation for the "From Text" tab for now.
-    // A proper fix would require a new flow that handles raw text.
     const { articleText, argument, sourceUrl, citation } = validatedFields.data;
     
-    if (!sourceUrl) {
-        return { message: 'The "From Text" feature currently requires a source URL to function.', evidence: [] };
-    }
-
     try {
-        const result = await generateCardsFlow({ url: sourceUrl });
-        const evidenceWithCitation = result.cards.map(ev => ({
-            claim: ev.claim,
-            quote: ev.quote,
-            explanation: ev.impact,
+        const result = await extractEvidenceFlow({ articleText, argument });
+        const evidenceWithCitation = result.evidence.map(ev => ({
+            claim: '',
+            quote: ev.card,
+            explanation: '',
             citation: {
-                author: citation.author || ev.author,
-                date: citation.date || ev.date,
+                author: citation.author || '',
+                date: citation.date || '',
                 publication: citation.publication || '',
-                title: citation.title || result.title,
-                url: sourceUrl || result.source,
+                title: citation.title || '',
+                url: sourceUrl || '',
             }
         }));
 

@@ -8,7 +8,7 @@ import { z } from 'zod';
 import { useEffect, useState } from 'react';
 import { useTheme } from 'next-themes';
 
-import { runExtractEvidence, runFetchAndExtractEvidence } from '@/app/actions';
+import { runExtractEvidence, runFetchAndExtractEvidence } from '@/lib/actions';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import {
