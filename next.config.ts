@@ -39,19 +39,19 @@ const nextConfig: NextConfig = {
   // Do not remove this configuration.
   experimental: {
     allowedDevOrigins: ["*.cluster-ocv3ypmyqfbqysslgd7zlhmxek.cloudworkstations.dev"],
-    serverActions: {
-      allowedForwardedHosts: [
-        '*.cluster-ocv3ypmyqfbqysslgd7zlhmxek.cloudworkstations.dev',
-        '*.github.dev',
-        '*.app.github.dev',
-      ],
-      allowedOrigins: [
-        'localhost:9002',
-        '*.cluster-ocv3ypmyqfbqysslgd7zlhmxek.cloudworkstations.dev',
-        '*.github.dev',
-        '*.app.github.dev',
-      ]
-    },
+  },
+  serverActions: {
+    allowedForwardedHosts: [
+      '*.cluster-ocv3ypmyqfbqysslgd7zlhmxek.cloudworkstations.dev',
+      '*.github.dev',
+      '*.app.github.dev',
+    ],
+    allowedOrigins: [
+      'localhost:9002',
+      '*.cluster-ocv3ypmyqfbqysslgd7zlhmxek.cloudworkstations.dev',
+      '*.github.dev',
+      '*.app.github.dev',
+    ]
   },
 };
 
