@@ -1,3 +1,4 @@
+
 'use server';
 
 /**
@@ -10,7 +11,6 @@
 
 import { ai, googleAI } from '@/ai/genkit';
 import { z } from 'genkit';
-import { extractText } from '@genkit-ai/google-genai/media';
 
 const GenerateCardsInputSchema = z.object({
   url: z.string().url().describe('The URL of the article to cut cards from.'),
@@ -43,31 +43,29 @@ export async function generateCards(
 
 const prompt = ai.definePrompt({
   name: 'generateCardsPrompt',
-  input: { schema: z.object({ articleText: z.string(), source: z.string() }) },
+  input: { schema: GenerateCardsInputSchema },
   output: { schema: GenerateCardsOutputSchema },
-  prompt: `You are an expert debate coach and researcher, specializing in cutting evidence ("cards") for national-level competitors. Your task is to analyze the provided article text and extract 3-5 high-quality, distinct pieces of evidence.
-
-**Article Text:**
-{{{articleText}}}
+  prompt: `You are an expert debate coach and researcher, specializing in cutting evidence ("cards") for national-level competitors. Your task is to access the content of the provided URL, analyze the article, and extract 3-5 high-quality, distinct pieces of evidence.
 
 **Source URL:**
-{{{source}}}
+{{{url}}}
 
 **CRITICAL INSTRUCTIONS:**
-1.  **Identify Core Arguments:** Read through the entire article and identify the 3-5 most important and distinct arguments or claims made by the author.
-2.  **Extract Verbatim Evidence:** For each argument, find the most powerful and concise quote that directly supports it. The quote MUST be copied verbatim from the text.
-3.  **Synthesize and Structure:** For each piece of evidence, you will create a structured "card" object with the following fields:
+1.  **Access and Read:** First, you must access the content of the article at the provided URL.
+2.  **Identify Core Arguments:** Read through the entire article and identify the 3-5 most important and distinct arguments or claims made by the author.
+3.  **Extract Verbatim Evidence:** For each argument, find the most powerful and concise quote that directly supports it. The quote MUST be copied verbatim from the text.
+4.  **Synthesize and Structure:** For each piece of evidence, you will create a structured "card" object with the following fields:
     *   **tag:** A very short, punchy headline for the card. 2-3 words max (e.g., "Inflation Cooling," "AI Threatens Jobs").
     *   **author:** The author or publication.
     *   **date:** The publication date.
     *   **claim:** A single sentence that summarizes the core argument of the card.
     *   **quote:** The verbatim text extracted from the article.
     *   **impact:** Briefly explain the significance or "so what" of this argument.
-4.  **Article Metadata:**
+5.  **Article Metadata:**
     *   **title:** The original title of the article.
     *   **source:** The original URL provided.
 
-Your final output must be in the specified JSON format. Ensure all fields are filled out accurately based *only* on the provided text.
+Your final output must be in the specified JSON format. Ensure all fields are filled out accurately based *only* on the provided text from the URL.
 `,
 });
 
@@ -78,9 +76,7 @@ const generateCardsFlow = ai.defineFlow(
     outputSchema: GenerateCardsOutputSchema,
   },
   async (input) => {
-    const articleText = await extractText({ url: input.url });
-    
-    const { output } = await prompt({ articleText, source: input.url });
+    const { output } = await prompt(input);
     return output!;
   }
 );
