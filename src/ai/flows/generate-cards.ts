@@ -10,7 +10,7 @@
 
 import { ai, googleAI } from '@/ai/genkit';
 import { z } from 'genkit';
-import { extractText } from '@genkit-ai/google-genai';
+import { extractText } from '@genkit-ai/google-genai/media';
 
 const GenerateCardsInputSchema = z.object({
   url: z.string().url().describe('The URL of the article to cut cards from.'),
