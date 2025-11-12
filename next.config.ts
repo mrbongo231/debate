@@ -39,10 +39,12 @@ const nextConfig: NextConfig = {
       allowedForwardedHosts: [
         '*.cluster-ocv3ypmyqfbqysslgd7zlhmxek.cloudworkstations.dev',
         '*.github.dev',
+        '*.app.github.dev',
       ],
       allowedOrigins: [
         '*.cluster-ocv3ypmyqfbqysslgd7zlhmxek.cloudworkstations.dev',
         '*.github.dev',
+        '*.app.github.dev',
       ]
     },
   },
