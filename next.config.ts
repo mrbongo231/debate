@@ -38,6 +38,7 @@ const nextConfig: NextConfig = {
   // This is required for Studio to function correctly.
   // Do not remove this configuration.
   experimental: {
+    allowedDevOrigins: ["*.cluster-ocv3ypmyqfbqysslgd7zlhmxek.cloudworkstations.dev"],
     serverActions: {
       allowedForwardedHosts: [
         '*.cluster-ocv3ypmyqfbqysslgd7zlhmxek.cloudworkstations.dev',
