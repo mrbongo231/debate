@@ -9,7 +9,7 @@ import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, For
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { Loader2, Wand2, Mic, CheckCircle, XCircle, Copy } from 'lucide-react';
-import { getCongressSpeechAction } from '@/app/actions';
+import { getCongressSpeechAction } from '@/lib/actions';
 import { useToast } from '@/hooks/use-toast';
 import { Skeleton } from '@/components/ui/skeleton';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
@@ -227,3 +227,5 @@ export default function CongressPage() {
       </div>
     </main>
   );
+
+    

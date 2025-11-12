@@ -2,11 +2,12 @@
 
 import { extractEvidence as extractEvidenceFlow } from '@/ai/flows/extract-evidence-from-article';
 import { generateCards as generateCardsFlow } from '@/ai/flows/generate-cards';
-import { z } from 'zod';
-import type { EvidenceCard as EvidenceCardType, Citation } from '@/lib/definitions';
 import { GenerateSpeechOutlineInput, generateSpeechOutline } from '@/ai/flows/generate-speech-outline';
 import { GenerateExtempSpeechInput, GenerateExtempSpeechOutput, generateExtempSpeech } from '@/ai/flows/generate-extemp-speech';
 import { GenerateCongressSpeechInput, GenerateCongressSpeechOutput, generateCongressSpeech } from '@/ai/flows/generate-congress-speech';
+
+import { z } from 'zod';
+import type { EvidenceCard as EvidenceCardType, ResearchEvidenceCard, Citation } from '@/lib/definitions';
 
 
 export async function getSpeechOutlineAction(input: GenerateSpeechOutlineInput) {
@@ -42,7 +43,6 @@ export async function getCongressSpeechAction(
     return { success: false, error: 'Failed to generate Congress speech.' };
   }
 }
-
 
 // Schema for URL-based extraction
 const fetchSchema = z.object({
@@ -84,7 +84,7 @@ export async function runFetchAndExtractEvidence(prevState: FetchState, formData
             citation: {
                 author: card.author,
                 date: card.date,
-                publication: '',
+                publication: '', // This can be improved if the flow provides it
                 title: result.title,
                 url: result.source,
             }
@@ -146,14 +146,14 @@ export async function runExtractEvidence(prevState: ExtractState, formData: Form
     try {
         const result = await extractEvidenceFlow({ articleText, argument });
         const evidenceWithCitation = result.evidence.map(ev => ({
-            claim: '',
-            quote: ev.card,
-            explanation: '',
+            claim: argument, // The flow for text extraction doesn't provide a claim, so we use the argument
+            quote: ev.card.replace(/<highlight>/g, '**').replace(/<\/highlight>/g, '**'), // Convert highlight tags to markdown
+            explanation: 'This evidence was extracted directly from the provided text based on your argument.',
             citation: {
                 author: citation.author || '',
                 date: citation.date || '',
                 publication: citation.publication || '',
-                title: citation.title || '',
+                title: citation.title || 'Manually Provided Text',
                 url: sourceUrl || '',
             }
         }));

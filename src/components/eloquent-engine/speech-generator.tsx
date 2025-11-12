@@ -10,7 +10,7 @@ import { Form, FormControl, FormField, FormItem, FormMessage } from '@/component
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { Loader2, Wand2 } from 'lucide-react';
-import { getSpeechOutlineAction } from '@/app/actions';
+import { getSpeechOutlineAction } from '@/lib/actions';
 import { useToast } from '@/hooks/use-toast';
 import { Skeleton } from '@/components/ui/skeleton';
 
@@ -136,3 +136,5 @@ export function SpeechGenerator() {
     </div>
   );
 }
+
+    

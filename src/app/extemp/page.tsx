@@ -10,7 +10,7 @@ import { Form, FormControl, FormField, FormItem, FormMessage } from '@/component
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { Loader2, Wand2, Timer } from 'lucide-react';
-import { getExtempSpeechAction } from '@/app/actions';
+import { getExtempSpeechAction } from '@/lib/actions';
 import { useToast } from '@/hooks/use-toast';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -220,3 +220,5 @@ export default function ExtempPage() {
     </main>
   );
 }
+
+    
