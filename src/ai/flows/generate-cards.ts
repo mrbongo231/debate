@@ -10,7 +10,7 @@
 
 import { ai, googleAI } from '@/ai/genkit';
 import { z } from 'genkit';
-import { extractText } from 'genkit/experimental/html';
+import { extractText } from '@genkit-ai/google-genai';
 
 const GenerateCardsInputSchema = z.object({
   url: z.string().url().describe('The URL of the article to cut cards from.'),
@@ -78,7 +78,7 @@ const generateCardsFlow = ai.defineFlow(
     outputSchema: GenerateCardsOutputSchema,
   },
   async (input) => {
-    const articleText = await extractText(input.url);
+    const articleText = await extractText({ url: input.url });
     
     const { output } = await prompt({ articleText, source: input.url });
     return output!;
