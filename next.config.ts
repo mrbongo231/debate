@@ -42,6 +42,7 @@ const nextConfig: NextConfig = {
         '*.app.github.dev',
       ],
       allowedOrigins: [
+        'localhost:9002',
         '*.cluster-ocv3ypmyqfbqysslgd7zlhmxek.cloudworkstations.dev',
         '*.github.dev',
         '*.app.github.dev',
