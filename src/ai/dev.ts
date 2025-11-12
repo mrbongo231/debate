@@ -1,6 +1,4 @@
 'use server';
-import { config } from 'dotenv';
-config();
 
 import '@/ai/flows/generate-speech-outline.ts';
 import '@/ai/flows/generate-extemp-speech.ts';
