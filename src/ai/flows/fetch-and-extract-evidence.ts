@@ -45,7 +45,7 @@ Goal: Create cut cards that are concise, well-shaped, and flow-efficient — giv
 **COMPONENT BREAKDOWN**
 1.  **[BOLD: …] — Tagline**: A single, clear, assertive sentence summarizing the main argument. Example: '[BOLD: Rejoining the EU single market takes over a decade.]'
 2.  **[SOURCE: …] — Source Line**: You MUST create this based on the article's metadata. Include every element: Author’s full name, Year, Publication name, Exact date (month-day-year), Full article title in quotes, and the Full URL.
-    Example: '[SOURCE: Luke McGee, 2024, Prospect Magazine, 10-28-2024, “Sorry Rejoiners—The UK’s Path Back to Europe Will Be Slow.”, https://www.prospectmagazine.co.uk/politics/brexit/68353/sorry-rejoiners-the-uks-path-back-to-europe-will-be-slow]'
+    Example: '[SOURCE: Luke McGee, 2024, Prospect Magazine, 10-28-2024, "Sorry Rejoiners—The UK’s Path Back to Europe Will Be Slow.", https://www.prospectmagazine.co.uk/politics/brexit/68353/sorry-rejoiners-the-uks-path-back-to-europe-will-be-slow]'
 3.  **[highlight(...)] — Spoken Text**: This marks the exact language the debater will read aloud. Only highlight the most essential phrases. The highlights should flow together seamlessly. Use '[highlight(some text)]' syntax.
 
 **Styling and Rules**
@@ -66,6 +66,6 @@ const fetchAndExtractEvidenceFlow = ai.defineFlow(
   },
   async input => {
     const { output } = await prompt(input);
-    return output!;
+    return output || '';
   }
 );

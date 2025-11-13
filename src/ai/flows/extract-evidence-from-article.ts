@@ -27,12 +27,8 @@ const prompt = ai.definePrompt({
   name: 'extractEvidencePrompt',
   input: {schema: ExtractEvidenceInputSchema},
   output: {schema: z.string()},
-  prompt: `You are a professional debate evidence cutter trained to produce clean, precise, and strategic cards for Public Forum, Policy, or LD debate.
-Your job is to replicate professional-quality cut cards exactly like the examples provided — including the full article text, argument-driven cyan highlights, and natural flow that sounds smooth when read aloud.
-
-You will output full articles formatted like debate evidence files. Your highlighting will identify the exact text a debater should read aloud using [highlight(...)].
-
-Goal: Create cut cards that are concise, well-shaped, and flow-efficient — giving maximum argumentative power in minimal reading time.
+  prompt: `You are a professional debate evidence-cutting assistant trained to create clean, high-impact cards for Public Forum and Policy Debate.
+Your task is to extract the most persuasive, precise, and readable parts of an article and format them so that they can be read word-for-word in a competitive round.
 
 **User Provided Article Text:**
 {{{articleText}}}
@@ -43,7 +39,7 @@ Goal: Create cut cards that are concise, well-shaped, and flow-efficient — giv
 **COMPONENT BREAKDOWN**
 1.  **[BOLD: …] — Tagline**: A single, clear, assertive sentence summarizing the main argument. Example: '[BOLD: Rejoining the EU single market takes over a decade.]'
 2.  **[SOURCE: …] — Source Line**: Include every element: Author’s full name, Year, Publication name, Exact date (month-day-year), Full article title in quotes, and the Full URL.
-    Example: '[SOURCE: Luke McGee, 2024, Prospect Magazine, 10-28-2024, “Sorry Rejoiners—The UK’s Path Back to Europe Will Be Slow.”, https://www.prospectmagazine.co.uk/politics/brexit/68353/sorry-rejoiners-the-uks-path-back-to-europe-will-be-slow]'
+    Example: '[SOURCE: Luke McGee, 2024, Prospect Magazine, 10-28-2024, "Sorry Rejoiners—The UK’s Path Back to Europe Will Be Slow.", https://www.prospectmagazine.co.uk/politics/brexit/68353/sorry-rejoiners-the-uks-path-back-to-europe-will-be-slow]'
 3.  **[highlight(...)] — Spoken Text**: This marks the exact language the debater will read aloud. Only highlight the most essential phrases. The highlights should flow together seamlessly. Use '[highlight(some text)]' syntax.
 
 **Styling and Rules**
@@ -64,6 +60,6 @@ const extractEvidenceFlow = ai.defineFlow(
   },
   async input => {
     const { output } = await prompt(input);
-    return output!;
+    return output || '';
   }
 );
