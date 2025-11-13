@@ -16,7 +16,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useTheme } from 'next-themes';
 
 interface EvidenceCardProps {
-  evidence: EvidenceCardType & { citation: string };
+  evidence: EvidenceCardType;
   highlightColor?: string;
 }
 
@@ -73,11 +73,11 @@ export function EvidenceCard({ evidence, highlightColor = '#00FFFF' }: EvidenceC
       <p><b>${evidence.claim}</b></p>
       <pre style="white-space: pre-wrap; font-family: monospace;">${evidence.citation}</pre>
       <p>${
-        evidence.quote.replace(/\[highlight\((.*?)\)\]/g, `<span style="background-color: ${getHighlightCss()};">$1</span>`)
+        evidence.quote.replace(/\[highlight\(([\s\S]*?)\)\]/g, `<span style="background-color: ${getHighlightCss()};">$1</span>`)
       }</p>
     `;
 
-    const plainText = `${evidence.claim}\n${evidence.citation}\n\n${evidence.quote.replace(/\[highlight\((.*?)\)\]/g, '$1')}`;
+    const plainText = `${evidence.claim}\n${evidence.citation}\n\n${evidence.quote.replace(/\[highlight\(([\s\S]*?)\)\]/g, '$1')}`;
 
     try {
       const blob = new Blob([cardHtml], { type: 'text/html' });
@@ -100,21 +100,26 @@ export function EvidenceCard({ evidence, highlightColor = '#00FFFF' }: EvidenceC
   };
 
   const renderHighlightedCard = (card: string) => {
-    const parts = card.split(/(\[highlight\((?:.|\n)*?\)\])/g);
+    // This regex will find all occurrences of [highlight(...)] and the text between them.
+    const parts = card.match(/\[highlight\(([\s\S]*?)\)\]|[\s\S]+?(?=\[highlight\(|$)/g) || [];
+    
     return (
       <p className="text-sm/relaxed whitespace-pre-wrap">
-        {parts.map((part, i) =>
-          part.startsWith('[highlight(') ? (
-            <span key={i} style={{ backgroundColor: getHighlightCss() }}>
-              {part.substring(10, part.length - 2)}
-            </span>
-          ) : (
-            part
-          )
-        )}
+        {parts.map((part, i) => {
+          const highlightMatch = part.match(/\[highlight\(([\s\S]*?)\)\]/);
+          if (highlightMatch) {
+            return (
+              <span key={i} style={{ backgroundColor: getHighlightCss() }}>
+                {highlightMatch[1]}
+              </span>
+            );
+          }
+          return part;
+        })}
       </p>
     );
   };
+
 
   return (
     <Card className={`${isDark ? 'bg-gradient-to-br from-gray-900/80 to-purple-900/30 backdrop-blur-lg border border-purple-500/30' : 'bg-card border-border'}`}>

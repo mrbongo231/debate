@@ -1,6 +1,6 @@
 'use client';
 
-import { useActionState } from 'react';
+import { useActionState, useTransition } from 'react';
 import { useFormStatus } from 'react-dom';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
@@ -26,6 +26,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { EvidenceCard } from './evidence-card';
 import { Scissors, LoaderCircle } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { EvidenceCard as EvidenceCardType } from '@/lib/definitions';
 
 const urlFormSchema = z.object({
   sourceUrl: z.string().url({ message: 'Please enter a valid URL.' }),
@@ -63,39 +64,68 @@ function SubmitButton() {
   );
 }
 
+type ActionState = {
+  message?: string | null;
+  evidence?: EvidenceCardType | null;
+  id: number;
+};
+
 export function CardCutterClient() {
   const { toast } = useToast();
   const { theme } = useTheme();
   const [mounted, setMounted] = useState(false);
-  
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  const isDark = mounted && theme === 'dark';
+  const [startTransition, isPending] = useTransition();
+  const [evidenceList, setEvidenceList] = useState<EvidenceCardType[]>([]);
 
   const [urlState, urlFormAction] = useActionState(runFetchAndExtractEvidence, {
     message: null,
     evidence: null,
+    id: 0,
   });
   
   const [textState, textFormAction] = useActionState(runExtractEvidence, {
     message: null,
     evidence: null,
+    id: 0,
   });
 
   const [activeTab, setActiveTab] = useState('url');
   
   // Use a unified state that updates based on the most recent action.
-  const [activeState, setActiveState] = useState({ message: null, evidence: null });
+  const [activeState, setActiveState] = useState<ActionState>({ message: null, evidence: null, id: 0 });
 
   useEffect(() => {
-    if (urlState.message || urlState.evidence) setActiveState(urlState);
-  }, [urlState]);
+    if (urlState.id > 0 && urlState.id !== activeState.id) {
+        setActiveState(urlState);
+        if (urlState.evidence) {
+            setEvidenceList(prev => [urlState.evidence!, ...prev]);
+        }
+    }
+  }, [urlState, activeState.id]);
 
   useEffect(() => {
-    if (textState.message || textState.evidence) setActiveState(textState);
-  }, [textState]);
+    if (textState.id > 0 && textState.id !== activeState.id) {
+        setActiveState(textState);
+        if (textState.evidence) {
+            setEvidenceList(prev => [textState.evidence!, ...prev]);
+        }
+    }
+  }, [textState, activeState.id]);
+
+  useEffect(() => {
+    if (activeState?.message) {
+      toast({
+        variant: 'destructive',
+        title: 'An error occurred',
+        description: activeState.message,
+      });
+    }
+  }, [activeState, toast]);
+
+  
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const urlForm = useForm<z.infer<typeof urlFormSchema>>({
     resolver: zodResolver(urlFormSchema),
@@ -117,21 +147,13 @@ export function CardCutterClient() {
       sourceUrl: '',
     },
   });
-
-  useEffect(() => {
-    if (activeState?.message && (!activeState.evidence || activeState.evidence.length === 0)) {
-      toast({
-        variant: 'destructive',
-        title: 'An error occurred',
-        description: activeState.message,
-      });
-    }
-  }, [activeState, toast]);
-
-  const argument = activeTab === 'url' ? urlForm.getValues('argument') : textForm.getValues('argument');
-  const source = activeTab === 'url' ? urlForm.getValues('sourceUrl') : textForm.getValues('sourceUrl');
+  
   const { formState: urlFormState } = urlForm;
   const { formState: textFormState } = textForm;
+
+  const isSubmitting = urlFormState.isSubmitting || textFormState.isSubmitting;
+  const isDark = mounted && theme === 'dark';
+
 
   if (!mounted) {
     return null;
@@ -303,19 +325,16 @@ export function CardCutterClient() {
       <div className="space-y-4">
         <h2 className="text-2xl font-bold text-center lg:text-left font-headline">Extracted Evidence</h2>
         <div className="relative">
-          { (urlFormState.isSubmitting || textFormState.isSubmitting) ? (
+          { isSubmitting ? (
             <div className="space-y-4">
               <Skeleton className={`h-48 w-full ${isDark ? 'bg-gray-800/50' : 'bg-muted'}`} />
             </div>
-          ) : activeState?.evidence && activeState.evidence.length > 0 ? (
+          ) : evidenceList.length > 0 ? (
             <div className="max-h-[60vh] overflow-y-auto scroll-fade p-2 -m-2 space-y-4">
-              {activeState.evidence.map((ev, index) => (
+              {evidenceList.map((ev, index) => (
                 <EvidenceCard
                   key={index}
                   evidence={ev}
-                  argument={argument}
-                  source={source || ev.citation.url}
-                  citation={ev.citation}
                 />
               ))}
             </div>
