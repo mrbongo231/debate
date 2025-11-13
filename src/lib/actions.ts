@@ -69,12 +69,12 @@ const fetchSchema = z.object({
   argument: z.string().min(10, 'Argument must be at least 10 characters.'),
 });
 
-type FetchState = {
+type ActionState = {
   message?: string | null;
   evidence?: (EvidenceCardType & { citation: string })[] | null;
 };
 
-export async function runFetchAndExtractEvidence(prevState: FetchState, formData: FormData): Promise<FetchState> {
+export async function runFetchAndExtractEvidence(prevState: ActionState, formData: FormData): Promise<ActionState> {
   const validatedFields = fetchSchema.safeParse({
     sourceUrl: formData.get('sourceUrl'),
     argument: formData.get('argument'),
@@ -91,13 +91,13 @@ export async function runFetchAndExtractEvidence(prevState: FetchState, formData
   try {
     const result = await fetchAndExtractEvidenceFlow({ sourceUrl, argument });
     
-    if (!result) {
+    if (!result || !result.card) {
       return { message: 'No evidence could be extracted. The AI returned an empty response. Try refining your argument or using a different article.', evidence: [] };
     }
 
-    const parsed = parseCardString(result);
+    const parsed = parseCardString(result.card);
     if (!parsed) {
-      console.error("Failed to parse card string:", result);
+      console.error("Failed to parse card string:", result.card);
       return { message: 'Failed to parse the evidence returned from the AI. The format was incorrect.', evidence: [] };
     }
     const evidence = [{
@@ -119,12 +119,8 @@ const extractSchema = z.object({
   argument: z.string().min(10, 'Argument must be at least 10 characters.'),
 });
 
-type ExtractState = {
-    message?: string | null;
-    evidence?: (EvidenceCardType & { citation: string })[] | null;
-};
 
-export async function runExtractEvidence(prevState: ExtractState, formData: FormData): Promise<ExtractState> {
+export async function runExtractEvidence(prevState: ActionState, formData: FormData): Promise<ActionState> {
     const validatedFields = extractSchema.safeParse({
         articleText: formData.get('articleText'),
         argument: formData.get('argument'),
@@ -141,13 +137,13 @@ export async function runExtractEvidence(prevState: ExtractState, formData: Form
     try {
         const result = await extractEvidenceFlow({ articleText, argument });
 
-        if (!result) {
+        if (!result || !result.card) {
           return { message: 'No evidence could be extracted. The AI returned an empty response. Try refining your argument.', evidence: [] };
         }
 
-        const parsed = parseCardString(result);
+        const parsed = parseCardString(result.card);
          if (!parsed) {
-            console.error("Failed to parse card string:", result);
+            console.error("Failed to parse card string:", result.card);
             return { message: 'Failed to parse the evidence returned from the AI. The format was incorrect.', evidence: [] };
         }
         const evidence = [{
