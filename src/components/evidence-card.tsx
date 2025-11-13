@@ -47,19 +47,28 @@ export function EvidenceCard({ evidence, argument, source, citation, highlightCo
         return source || 'No citation provided.';
     }
     const doa = format(new Date(), 'M-d-yyyy');
-    const year = cit.date ? new Date(cit.date).getFullYear().toString().slice(-2) : 'N/A';
-    const authorLastName = cit.author?.split(' ').pop() || 'N/A';
-    const dateFormatted = cit.date ? format(new Date(cit.date.split('T')[0]), 'M-d-yyyy') : 'N/A';
+    const year = cit.date ? new Date(cit.date).getFullYear().toString().slice(-2) : '';
+    const authorLastName = cit.author?.split(' ').pop() || '';
+    
+    // Ensure date is valid before trying to format
+    let dateFormatted = '';
+    if (cit.date) {
+        try {
+            dateFormatted = format(new Date(cit.date.replace(/-/g, '/')), 'M-d-yyyy');
+        } catch (e) {
+            // keep it empty if date is invalid
+        }
+    }
     
     let citationString = `${authorLastName} ${year} [`;
-    citationString += `${cit.author || 'N/A'}`;
+    citationString += `${cit.author || ''}`;
     if (cit.title) citationString += `, "${cit.title}"`;
     if (cit.publication) citationString += `, ${cit.publication}`;
-    citationString += `, ${dateFormatted}`;
+    if (dateFormatted) citationString += `, ${dateFormatted}`;
     if (source) citationString += `, ${source}`;
     citationString += `, DOA: ${doa}]`;
 
-    return citationString;
+    return citationString.replace(/, ,/g, ',').replace(/\[, /g, '[').trim();
   };
 
   const fullCitationText = formatCitation(citation);
@@ -69,7 +78,7 @@ export function EvidenceCard({ evidence, argument, source, citation, highlightCo
       const savedEvidence = JSON.parse(localStorage.getItem('evidenceLibrary') || '[]');
       const newCard = {
         argument,
-        card: evidence.quote, // Mapped from evidence.quote
+        card: evidence.quote, 
         source: source || citation.url || "N/A",
         citation: fullCitationText
       };
@@ -153,7 +162,7 @@ export function EvidenceCard({ evidence, argument, source, citation, highlightCo
     <>
       <Card className={`${isDark ? 'bg-gradient-to-br from-gray-900/80 to-purple-900/30 backdrop-blur-lg border border-purple-500/30' : 'bg-card border-border'}`}>
         <CardHeader>
-          <CardTitle className="text-lg text-primary">Evidence Card</CardTitle>
+          <CardTitle className="text-lg text-primary">{argument}</CardTitle>
            <CardDescription>
             {fullCitationText}
           </CardDescription>

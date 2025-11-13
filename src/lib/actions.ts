@@ -5,9 +5,10 @@ import { generateCards as generateCardsFlow } from '@/ai/flows/generate-cards';
 import { GenerateSpeechOutlineInput, generateSpeechOutline } from '@/ai/flows/generate-speech-outline';
 import { GenerateExtempSpeechInput, GenerateExtempSpeechOutput, generateExtempSpeech } from '@/ai/flows/generate-extemp-speech';
 import { GenerateCongressSpeechInput, GenerateCongressSpeechOutput, generateCongressSpeech } from '@/ai/flows/generate-congress-speech';
+import { fetchAndExtractEvidence } from '@/ai/flows/fetch-and-extract-evidence';
 
 import { z } from 'zod';
-import type { EvidenceCard as EvidenceCardType, ResearchEvidenceCard, Citation } from '@/lib/definitions';
+import type { EvidenceCard as EvidenceCardType, Citation } from '@/lib/definitions';
 
 
 export async function getSpeechOutlineAction(input: GenerateSpeechOutlineInput) {
@@ -75,21 +76,9 @@ export async function runFetchAndExtractEvidence(prevState: FetchState, formData
   const { sourceUrl, argument } = validatedFields.data;
 
   try {
-    const result = await generateCardsFlow({ url: sourceUrl });
-    if (result && result.cards.length > 0) {
-        const evidenceWithCitation: (EvidenceCardType & { citation: Citation })[] = result.cards.map(card => ({
-            claim: card.claim,
-            quote: card.quote,
-            explanation: card.impact,
-            citation: {
-                author: card.author,
-                date: card.date,
-                publication: '', // This can be improved if the flow provides it
-                title: result.title,
-                url: result.source,
-            }
-        }));
-      return { evidence: evidenceWithCitation, message: null };
+    const result = await fetchAndExtractEvidence({ sourceUrl, argument });
+    if (result && result.evidence.length > 0) {
+      return { evidence: result.evidence, message: null };
     } else {
       return { message: 'No evidence could be extracted. Try refining your argument or using a different article.', evidence: [] };
     }
@@ -146,8 +135,8 @@ export async function runExtractEvidence(prevState: ExtractState, formData: Form
     try {
         const result = await extractEvidenceFlow({ articleText, argument });
         const evidenceWithCitation = result.evidence.map(ev => ({
-            claim: argument, // The flow for text extraction doesn't provide a claim, so we use the argument
-            quote: ev.card.replace(/<highlight>/g, '**').replace(/<\/highlight>/g, '**'), // Convert highlight tags to markdown
+            claim: argument,
+            quote: ev.card,
             explanation: 'This evidence was extracted directly from the provided text based on your argument.',
             citation: {
                 author: citation.author || '',

@@ -123,7 +123,7 @@ export function CardCutterClient() {
   });
 
   useEffect(() => {
-    if (state?.message && !state.evidence) {
+    if (state?.message && (!state.evidence || state.evidence.length === 0)) {
       toast({
         variant: 'destructive',
         title: 'An error occurred',
