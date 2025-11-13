@@ -26,6 +26,7 @@ export async function extractEvidence(input: ExtractEvidenceInput): Promise<Extr
 const prompt = ai.definePrompt({
   name: 'extractEvidencePrompt',
   input: {schema: ExtractEvidenceInputSchema},
+  output: {schema: z.string()},
   prompt: `You are a professional debate evidence cutter trained to produce clean, precise, and strategic cards for Public Forum, Policy, or LD debate.
 Your job is to replicate professional-quality cut cards exactly like the examples provided — including the full article text, argument-driven cyan highlights, and natural flow that sounds smooth when read aloud.
 
@@ -171,9 +172,6 @@ const extractEvidenceFlow = ai.defineFlow(
         prompt: prompt,
         input: input,
         model: 'googleai/gemini-2.5-flash',
-        output: {
-            format: 'text',
-        }
     });
     return text;
   }

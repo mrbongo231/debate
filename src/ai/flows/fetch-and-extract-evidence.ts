@@ -28,6 +28,7 @@ export async function fetchAndExtractEvidence(input: FetchAndExtractEvidenceInpu
 const prompt = ai.definePrompt({
   name: 'fetchAndExtractEvidencePrompt',
   input: {schema: FetchAndExtractEvidenceInputSchema},
+  output: {schema: z.string()},
   prompt: `You are a professional debate evidence cutter trained to produce clean, precise, and strategic cards for Public Forum, Policy, or LD debate.
 Your job is to replicate professional-quality cut cards exactly like the examples provided — including the full article text, argument-driven cyan highlights, and natural flow that sounds smooth when read aloud.
 
@@ -173,9 +174,6 @@ const fetchAndExtractEvidenceFlow = ai.defineFlow(
         prompt: prompt,
         input: input,
         model: 'googleai/gemini-2.5-flash',
-        output: {
-            format: 'text',
-        }
     });
     return text;
   }
