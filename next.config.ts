@@ -38,11 +38,6 @@ const nextConfig: NextConfig = {
     allowedForwardedHosts: ['localhost', '*.github.dev', '*.app.github.dev'],
     allowedOrigins: ['localhost:9002', '*.github.dev', '*.app.github.dev'],
   },
-  experimental: {
-    // This is required for Studio to function correctly.
-    // Do not remove this configuration.
-    allowedDevOrigins: ["*.cluster-ocv3ypmyqfbqysslgd7zlhmxek.cloudworkstations.dev"],
-  },
 };
 
 export default nextConfig;
