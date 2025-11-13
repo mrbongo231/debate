@@ -5,7 +5,7 @@ import { generateCards as generateCardsFlow } from '@/ai/flows/generate-cards';
 import { GenerateSpeechOutlineInput, generateSpeechOutline } from '@/ai/flows/generate-speech-outline';
 import { GenerateExtempSpeechInput, GenerateExtempSpeechOutput, generateExtempSpeech } from '@/ai/flows/generate-extemp-speech';
 import { GenerateCongressSpeechInput, GenerateCongressSpeechOutput, generateCongressSpeech } from '@/ai/flows/generate-congress-speech';
-import { fetchAndExtractEvidence } from '@/ai/flows/fetch-and-extract-evidence';
+import { fetchAndExtractEvidence as fetchAndExtractEvidenceFlow } from '@/ai/flows/fetch-and-extract-evidence';
 
 import { z } from 'zod';
 import type { EvidenceCard as EvidenceCardType, Citation } from '@/lib/definitions';
@@ -45,6 +45,41 @@ export async function getCongressSpeechAction(
   }
 }
 
+function parseCardString(cardString: string): Omit<EvidenceCardType, 'explanation'> {
+    const boldRegex = /\[BOLD:\s*(.*?)\]/;
+    const sourceRegex = /\[SOURCE:\s*(.*?)\]/;
+    
+    const claimMatch = cardString.match(boldRegex);
+    const sourceMatch = cardString.match(sourceRegex);
+    
+    const claim = claimMatch ? claimMatch[1] : 'No claim found';
+    const rawSource = sourceMatch ? sourceMatch[1] : '';
+
+    const body = cardString.replace(boldRegex, '').replace(sourceRegex, '').trim();
+    const quote = body.replace(/\[HIGHLIGHT:\s*(.*?)\]/g, '<highlight>$1</highlight>');
+
+    return { claim, quote, rawSource };
+}
+
+function parseSourceString(sourceStr: string): Citation {
+    const parts = sourceStr.split(',').map(s => s.trim());
+    const citation: Citation = {};
+    if (parts.length > 0) citation.author = parts[0];
+    if (parts.length > 1) {
+        const yearMatch = parts[1].match(/\d{4}/);
+        if (yearMatch) {
+            citation.date = parts[1];
+        }
+    }
+    if (parts.length > 2) citation.publication = parts[2];
+    if (parts.length > 4) citation.title = parts[4].replace(/"/g, '');
+    const urlMatch = sourceStr.match(/https?:\/\/[^\s,]+/);
+    if (urlMatch) citation.url = urlMatch[0];
+    
+    return citation;
+}
+
+
 // Schema for URL-based extraction
 const fetchSchema = z.object({
   sourceUrl: z.string().url('Please provide a valid source URL.'),
@@ -76,9 +111,16 @@ export async function runFetchAndExtractEvidence(prevState: FetchState, formData
   const { sourceUrl, argument } = validatedFields.data;
 
   try {
-    const result = await fetchAndExtractEvidence({ sourceUrl, argument });
-    if (result && result.evidence.length > 0) {
-      return { evidence: result.evidence, message: null };
+    const result = await fetchAndExtractEvidenceFlow({ sourceUrl, argument });
+    if (result && result.card) {
+      const parsedCard = parseCardString(result.card);
+      const citation = parseSourceString(parsedCard.rawSource || '');
+      const evidence = [{
+          ...parsedCard,
+          explanation: '',
+          citation: citation
+      }];
+      return { evidence, message: null };
     } else {
       return { message: 'No evidence could be extracted. Try refining your argument or using a different article.', evidence: [] };
     }
@@ -134,24 +176,28 @@ export async function runExtractEvidence(prevState: ExtractState, formData: Form
     
     try {
         const result = await extractEvidenceFlow({ articleText, argument });
-        const evidenceWithCitation = result.evidence.map(ev => ({
-            claim: argument,
-            quote: ev.card,
-            explanation: 'This evidence was extracted directly from the provided text based on your argument.',
-            citation: {
-                author: citation.author || '',
-                date: citation.date || '',
-                publication: citation.publication || '',
-                title: citation.title || 'Manually Provided Text',
-                url: sourceUrl || '',
-            }
-        }));
+        if (result && result.card) {
+            const parsedCard = parseCardString(result.card);
+            
+            const evidenceWithCitation = [{
+                claim: parsedCard.claim,
+                quote: parsedCard.quote,
+                explanation: 'This evidence was extracted directly from the provided text based on your argument.',
+                citation: {
+                    author: citation.author || '',
+                    date: citation.date || '',
+                    publication: citation.publication || '',
+                    title: citation.title || 'Manually Provided Text',
+                    url: sourceUrl || '',
+                }
+            }];
 
-        if (evidenceWithCitation.length > 0) {
-            return { evidence: evidenceWithCitation, message: null };
-        } else {
-             return { message: 'No evidence could be extracted from the provided text.', evidence: [] };
+            if (evidenceWithCitation.length > 0) {
+                return { evidence: evidenceWithCitation, message: null };
+            }
         }
+        return { message: 'No evidence could be extracted from the provided text.', evidence: [] };
+
     } catch (error) {
         console.error('Error extracting evidence from text:', error);
         return { message: 'An unexpected error occurred while processing the text.', evidence: null };

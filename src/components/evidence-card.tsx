@@ -38,19 +38,28 @@ export function EvidenceCard({ evidence, argument, source, citation, highlightCo
   };
 
   const getHighlightColor = () => {
-    const colorSet = highlightStyles[highlightColor] || highlightStyles.pink;
+    const colorSet = highlightStyles[highlightColor] || highlightStyles.cyan;
     return isDark ? colorSet.dark : colorSet.light;
   };
+  
+  const formatCitation = (cit: Citation, rawSource?: string) => {
+    if (rawSource) {
+        return rawSource;
+    }
 
-  const formatCitation = (cit: Citation) => {
     if (!cit.author && !cit.title) {
         return source || 'No citation provided.';
     }
     const doa = format(new Date(), 'M-d-yyyy');
-    const year = cit.date ? new Date(cit.date).getFullYear().toString().slice(-2) : '';
+    let year = 'N/A';
+    if(cit.date) {
+        try {
+            year = new Date(cit.date.replace(/-/g, '/')).getFullYear().toString().slice(-2);
+        } catch(e) {/* ignore invalid date */}
+    }
+
     const authorLastName = cit.author?.split(' ').pop() || '';
     
-    // Ensure date is valid before trying to format
     let dateFormatted = '';
     if (cit.date) {
         try {
@@ -71,13 +80,13 @@ export function EvidenceCard({ evidence, argument, source, citation, highlightCo
     return citationString.replace(/, ,/g, ',').replace(/\[, /g, '[').trim();
   };
 
-  const fullCitationText = formatCitation(citation);
+  const fullCitationText = formatCitation(citation, evidence.rawSource);
 
   const handleSave = () => {
     try {
       const savedEvidence = JSON.parse(localStorage.getItem('evidenceLibrary') || '[]');
       const newCard = {
-        argument,
+        argument: evidence.claim,
         card: evidence.quote, 
         source: source || citation.url || "N/A",
         citation: fullCitationText
@@ -112,14 +121,14 @@ export function EvidenceCard({ evidence, argument, source, citation, highlightCo
 
   const handleCopy = () => {
     const cardHtml = `
-      <p><b>${argument}</b></p>
+      <p><b>${evidence.claim}</b></p>
       <p><i>${fullCitationText}</i></p>
       <p>${
-        evidence.quote.replace(/<highlight>/g, `<span style="background-color: ${getHighlightColor()}; text-decoration: underline;">`).replace(/<\/highlight>/g, '</span>')
+        evidence.quote.replace(/<highlight>/g, `<span style="background-color: ${getHighlightColor()};">`).replace(/<\/highlight>/g, '</span>')
       }</p>
     `;
 
-    const plainText = `${argument}\n${fullCitationText}\n\n${evidence.quote.replace(/<\/?highlight>/g, '')}`;
+    const plainText = `${evidence.claim}\n${fullCitationText}\n\n${evidence.quote.replace(/<\/?highlight>/g, '')}`;
 
     try {
       const blob = new Blob([cardHtml], { type: 'text/html' });
@@ -147,7 +156,7 @@ export function EvidenceCard({ evidence, argument, source, citation, highlightCo
       <p className="text-sm/relaxed font-code">
         {parts.map((part, i) =>
           part.startsWith('<highlight>') ? (
-            <span key={i} className="font-bold underline" style={{ backgroundColor: getHighlightColor() }}>
+            <span key={i} className="font-bold" style={{ backgroundColor: getHighlightColor() }}>
               {part.replace(/<\/?highlight>/g, '')}
             </span>
           ) : (
@@ -162,8 +171,8 @@ export function EvidenceCard({ evidence, argument, source, citation, highlightCo
     <>
       <Card className={`${isDark ? 'bg-gradient-to-br from-gray-900/80 to-purple-900/30 backdrop-blur-lg border border-purple-500/30' : 'bg-card border-border'}`}>
         <CardHeader>
-          <CardTitle className="text-lg text-primary">{argument}</CardTitle>
-           <CardDescription>
+          <CardTitle className="text-lg font-bold text-primary">{evidence.claim}</CardTitle>
+           <CardDescription className="text-xs">
             {fullCitationText}
           </CardDescription>
         </CardHeader>
