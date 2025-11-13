@@ -47,34 +47,21 @@ export async function getCongressSpeechAction(
 function parseCardString(cardString: string): { claim: string; citation: string; quote: string } | null {
   if (!cardString || typeof cardString !== 'string') return null;
 
-  const boldRegex = /\[BOLD:\s*([\s\S]*?)\]/;
+  const claimRegex = /\[BOLD:\s*([\s\S]*?)\]/;
   const sourceRegex = /\[SOURCE:\s*([\s\S]*?)\]/;
 
-  const boldMatch = cardString.match(boldRegex);
+  const claimMatch = cardString.match(claimRegex);
   const sourceMatch = cardString.match(sourceRegex);
+  
+  if (!claimMatch || !sourceMatch) return null;
 
-  if (!boldMatch || !sourceMatch) {
-    // Fallback for older or malformed format
-    const lines = cardString.trim().split('\n');
-    const claim = lines.find(line => !line.startsWith('McGee 24'))?.replace(/\*\*/g, '').trim() || 'Argument';
-    const citation = lines.find(line => line.startsWith('McGee 24')) || 'No citation provided.';
-    const quoteIndex = lines.findIndex(line => line.trim().toLowerCase() === 'shaan');
-    const quote = quoteIndex !== -1 ? lines.slice(quoteIndex + 1).join('\n').trim() : lines.slice(1).join('\n').trim();
-
-    if (!quote) return null;
-    return { claim, citation, quote };
-  }
-
-  const claim = boldMatch[1].trim();
+  const claim = claimMatch[1].trim();
   const citation = sourceMatch[1].trim();
-
-  // The quote is everything after the [SOURCE:...] tag
   const sourceEndIndex = cardString.indexOf(sourceMatch[0]) + sourceMatch[0].length;
   const quote = cardString.substring(sourceEndIndex).trim();
 
   return { claim, citation, quote };
 }
-
 
 // Schema for URL-based extraction
 const fetchSchema = z.object({
@@ -83,10 +70,6 @@ const fetchSchema = z.object({
 });
 
 type FetchState = {
-  errors?: {
-    argument?: string[];
-    sourceUrl?: string[];
-  };
   message?: string | null;
   evidence?: (EvidenceCardType & { citation: string })[] | null;
 };
@@ -99,7 +82,6 @@ export async function runFetchAndExtractEvidence(prevState: FetchState, formData
 
   if (!validatedFields.success) {
     return {
-      errors: validatedFields.error.flatten().fieldErrors,
       message: 'Validation failed. Please check your inputs.',
     };
   }
@@ -108,20 +90,22 @@ export async function runFetchAndExtractEvidence(prevState: FetchState, formData
 
   try {
     const result = await fetchAndExtractEvidenceFlow({ sourceUrl, argument });
-    if (result) {
-      const parsed = parseCardString(result);
-      if (!parsed) {
-        console.error("Failed to parse card string:", result);
-        return { message: 'Failed to parse the evidence returned from the AI. The format was incorrect.', evidence: [] };
-      }
-      const evidence = [{
-          ...parsed,
-          explanation: '',
-      }];
-      return { evidence, message: null };
-    } else {
-      return { message: 'No evidence could be extracted. Try refining your argument or using a different article.', evidence: [] };
+    
+    if (!result) {
+      return { message: 'No evidence could be extracted. The AI returned an empty response. Try refining your argument or using a different article.', evidence: [] };
     }
+
+    const parsed = parseCardString(result);
+    if (!parsed) {
+      console.error("Failed to parse card string:", result);
+      return { message: 'Failed to parse the evidence returned from the AI. The format was incorrect.', evidence: [] };
+    }
+    const evidence = [{
+        ...parsed,
+        explanation: '',
+    }];
+    return { evidence, message: null };
+    
   } catch (error) {
     console.error('Error fetching and extracting evidence:', error);
     const errorMessage = (error as Error).message || 'An unexpected error occurred while processing the article. Please try again later.';
@@ -133,17 +117,9 @@ export async function runFetchAndExtractEvidence(prevState: FetchState, formData
 const extractSchema = z.object({
   articleText: z.string().min(50, 'Article text must be at least 50 characters.'),
   argument: z.string().min(10, 'Argument must be at least 10 characters.'),
-  citation: z.object({
-    author: z.string().optional(),
-    title: z.string().optional(),
-    publication: z.string().optional(),
-    date: z.string().optional(),
-  }),
-  sourceUrl: z.string().url('Please enter a valid URL.').optional().or(z.literal('')),
 });
 
 type ExtractState = {
-    errors?: z.ZodError<z.infer<typeof extractSchema>>['flatten']['fieldErrors'];
     message?: string | null;
     evidence?: (EvidenceCardType & { citation: string })[] | null;
 };
@@ -152,18 +128,10 @@ export async function runExtractEvidence(prevState: ExtractState, formData: Form
     const validatedFields = extractSchema.safeParse({
         articleText: formData.get('articleText'),
         argument: formData.get('argument'),
-        citation: {
-          author: formData.get('citation.author'),
-          title: formData.get('citation.title'),
-          publication: formData.get('citation.publication'),
-          date: formData.get('citation.date') || undefined,
-        },
-        sourceUrl: formData.get('sourceUrl'),
     });
 
     if (!validatedFields.success) {
         return {
-            errors: validatedFields.error.flatten().fieldErrors,
             message: 'Validation failed. Please check your inputs.',
         };
     }
@@ -172,22 +140,22 @@ export async function runExtractEvidence(prevState: ExtractState, formData: Form
     
     try {
         const result = await extractEvidenceFlow({ articleText, argument });
-        if (result) {
-            const parsed = parseCardString(result);
-             if (!parsed) {
-                console.error("Failed to parse card string:", result);
-                return { message: 'Failed to parse the evidence returned from the AI. The format was incorrect.', evidence: [] };
-            }
-            const evidence = [{
-                ...parsed,
-                explanation: 'This evidence was extracted directly from the provided text based on your argument.',
-            }];
 
-            if (evidence.length > 0) {
-                return { evidence: evidence, message: null };
-            }
+        if (!result) {
+          return { message: 'No evidence could be extracted. The AI returned an empty response. Try refining your argument.', evidence: [] };
         }
-        return { message: 'No evidence could be extracted from the provided text.', evidence: [] };
+
+        const parsed = parseCardString(result);
+         if (!parsed) {
+            console.error("Failed to parse card string:", result);
+            return { message: 'Failed to parse the evidence returned from the AI. The format was incorrect.', evidence: [] };
+        }
+        const evidence = [{
+            ...parsed,
+            explanation: 'This evidence was extracted directly from the provided text based on your argument.',
+        }];
+        
+        return { evidence: evidence, message: null };
 
     } catch (error) {
         console.error('Error extracting evidence from text:', error);
