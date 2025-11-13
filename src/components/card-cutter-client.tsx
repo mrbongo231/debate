@@ -300,29 +300,31 @@ export function CardCutterClient() {
       
       <div className="space-y-4">
         <h2 className="text-2xl font-bold text-center lg:text-left font-headline">Extracted Evidence</h2>
-        { (urlFormState.isSubmitting || textFormState.isSubmitting) ? (
-          <div className="space-y-4">
-            <Skeleton className={`h-48 w-full ${isDark ? 'bg-gray-800/50' : 'bg-muted'}`} />
-          </div>
-        ) : state?.evidence && state.evidence.length > 0 ? (
-          <div className="space-y-4">
-            {state.evidence.map((ev, index) => (
-              <EvidenceCard
-                key={index}
-                evidence={ev}
-                argument={argument}
-                source={source || ev.citation.url}
-                citation={ev.citation}
-              />
-            ))}
-          </div>
-        ) : (
-          <Card className="flex h-64 w-full items-center justify-center border-dashed">
-            <div className="text-center text-muted-foreground">
-              <p>Your evidence cards will appear here.</p>
+        <div className="relative">
+          { (urlFormState.isSubmitting || textFormState.isSubmitting) ? (
+            <div className="space-y-4">
+              <Skeleton className={`h-48 w-full ${isDark ? 'bg-gray-800/50' : 'bg-muted'}`} />
             </div>
-          </Card>
-        )}
+          ) : state?.evidence && state.evidence.length > 0 ? (
+            <div className="max-h-[60vh] overflow-y-auto scroll-fade p-2 -m-2 space-y-4">
+              {state.evidence.map((ev, index) => (
+                <EvidenceCard
+                  key={index}
+                  evidence={ev}
+                  argument={argument}
+                  source={source || ev.citation.url}
+                  citation={ev.citation}
+                />
+              ))}
+            </div>
+          ) : (
+            <Card className="flex h-64 w-full items-center justify-center border-dashed">
+              <div className="text-center text-muted-foreground">
+                <p>Your evidence cards will appear here.</p>
+              </div>
+            </Card>
+          )}
+        </div>
       </div>
     </div>
   );

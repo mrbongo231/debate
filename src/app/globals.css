@@ -74,3 +74,9 @@
     @apply bg-background text-foreground;
   }
 }
+
+@layer utilities {
+  .scroll-fade {
+    mask-image: linear-gradient(to bottom, transparent, black 5%, black 95%, transparent);
+  }
+}
