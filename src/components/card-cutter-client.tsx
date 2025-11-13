@@ -140,27 +140,6 @@ export function CardCutterClient() {
   if (!mounted) {
     return null;
   }
-  
-  const handleUrlSubmit = urlForm.handleSubmit((data) => {
-    setLastSubmittedTab('url');
-    const formData = new FormData();
-    formData.append('sourceUrl', data.sourceUrl);
-    formData.append('argument', data.argument);
-    urlFormAction(formData);
-  });
-  
-  const handleTextSubmit = textForm.handleSubmit((data) => {
-    setLastSubmittedTab('text');
-    const formData = new FormData();
-    formData.append('articleText', data.articleText);
-    formData.append('argument', data.argument);
-    formData.append('citation.author', data['citation.author'] || '');
-    formData.append('citation.title', data['citation.title'] || '');
-    formData.append('citation.publication', data['citation.publication'] || '');
-    formData.append('citation.date', data['citation.date'] || '');
-    formData.append('sourceUrl', data.sourceUrl || '');
-    textFormAction(formData);
-  });
 
   return (
     <div className="mx-auto max-w-4xl space-y-12">
@@ -177,7 +156,11 @@ export function CardCutterClient() {
             </TabsList>
             <TabsContent value="url">
               <Form {...urlForm}>
-                <form onSubmit={handleUrlSubmit} className="space-y-6 pt-4">
+                <form 
+                  action={urlFormAction} 
+                  onSubmit={urlForm.handleSubmit(() => setLastSubmittedTab('url'))}
+                  className="space-y-6 pt-4"
+                >
                   <FormField
                     control={urlForm.control}
                     name="sourceUrl"
@@ -210,7 +193,11 @@ export function CardCutterClient() {
             </TabsContent>
             <TabsContent value="text">
                 <Form {...textForm}>
-                <form onSubmit={handleTextSubmit} className="space-y-6 pt-4">
+                <form 
+                  action={textFormAction} 
+                  onSubmit={textForm.handleSubmit(() => setLastSubmittedTab('text'))} 
+                  className="space-y-6 pt-4"
+                >
                     <FormField
                       control={textForm.control}
                       name="articleText"
