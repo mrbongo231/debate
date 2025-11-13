@@ -142,10 +142,10 @@ export function CardCutterClient() {
   }
 
   return (
-    <div className="mx-auto max-w-4xl space-y-12 animate-fade-in-up animation-delay-200">
+    <div className="mx-auto max-w-4xl space-y-12">
       <Card className={`w-full ${isDark ? 'bg-gray-900/50 backdrop-blur-sm border-gray-700' : 'bg-card border-border'}`}>
         <CardHeader>
-          <CardTitle className={`text-primary`}>Card Cutter</CardTitle>
+          <CardTitle className="text-primary">Card Cutter</CardTitle>
           <CardDescription>Enter a source URL for automated extraction, or paste text for manual cutting.</CardDescription>
         </CardHeader>
         <CardContent>
@@ -299,10 +299,9 @@ export function CardCutterClient() {
       </Card>
       
       <div className="space-y-4">
-        <h2 className={`text-2xl font-bold text-center lg:text-left font-headline ${isDark ? 'text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-400' : 'text-foreground'}`}>Extracted Evidence</h2>
+        <h2 className="text-2xl font-bold text-center lg:text-left font-headline">Extracted Evidence</h2>
         { (urlFormState.isSubmitting || textFormState.isSubmitting) ? (
           <div className="space-y-4">
-            <Skeleton className={`h-48 w-full ${isDark ? 'bg-gray-800/50' : 'bg-muted'}`} />
             <Skeleton className={`h-48 w-full ${isDark ? 'bg-gray-800/50' : 'bg-muted'}`} />
           </div>
         ) : state?.evidence && state.evidence.length > 0 ? (
@@ -312,13 +311,13 @@ export function CardCutterClient() {
                 key={index}
                 evidence={ev}
                 argument={argument}
-                source={source || ''}
+                source={source || ev.citation.url}
                 citation={ev.citation}
               />
             ))}
           </div>
         ) : (
-          <Card className={`flex h-64 w-full items-center justify-center border-dashed`}>
+          <Card className="flex h-64 w-full items-center justify-center border-dashed">
             <div className="text-center text-muted-foreground">
               <p>Your evidence cards will appear here.</p>
             </div>
