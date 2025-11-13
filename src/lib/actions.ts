@@ -1,14 +1,13 @@
 'use server';
 
 import { extractEvidence as extractEvidenceFlow } from '@/ai/flows/extract-evidence-from-article';
-import { generateCards as generateCardsFlow } from '@/ai/flows/generate-cards';
 import { GenerateSpeechOutlineInput, generateSpeechOutline } from '@/ai/flows/generate-speech-outline';
 import { GenerateExtempSpeechInput, GenerateExtempSpeechOutput, generateExtempSpeech } from '@/ai/flows/generate-extemp-speech';
 import { GenerateCongressSpeechInput, GenerateCongressSpeechOutput, generateCongressSpeech } from '@/ai/flows/generate-congress-speech';
 import { fetchAndExtractEvidence as fetchAndExtractEvidenceFlow } from '@/ai/flows/fetch-and-extract-evidence';
 
 import { z } from 'zod';
-import type { EvidenceCard as EvidenceCardType, Citation } from '@/lib/definitions';
+import type { EvidenceCard as EvidenceCardType } from '@/lib/definitions';
 
 
 export async function getSpeechOutlineAction(input: GenerateSpeechOutlineInput) {
@@ -45,17 +44,48 @@ export async function getCongressSpeechAction(
   }
 }
 
-function parseCardString(cardString: string): { tagline: string, citation: string, body: string } {
-    const lines = cardString.split('\n');
-    
-    const tagline = lines.find(line => line.startsWith('**') && line.endsWith('**'))?.replace(/\*\*/g, '') || 'No tagline found';
-    
-    const citationEndIndex = lines.findIndex(line => line.trim() === 'shaan');
-    const citation = citationEndIndex !== -1 ? lines.slice(1, citationEndIndex + 1).join('\n') : 'No citation found';
-    
-    const body = citationEndIndex !== -1 ? lines.slice(citationEndIndex + 1).join('\n').trim() : cardString;
+function parseCardString(cardString: string): { claim: string, citation: string, quote: string } {
+    const lines = cardString.trim().split('\n');
+    let claim = '';
+    let citation = '';
+    let quote = '';
 
-    return { tagline, citation, body };
+    const boldTaglineMatch = cardString.match(/\[BOLD: (.*?)\]/s);
+    if (boldTaglineMatch) {
+        claim = boldTaglineMatch[1].trim();
+    } else {
+        // Fallback for older format
+        const firstLine = lines[0];
+        if (!firstLine.includes('[SOURCE:')) {
+            claim = firstLine.replace(/\*\*/g, '').trim();
+        }
+    }
+    
+    const sourceMatch = cardString.match(/\[SOURCE: (.*?)\]/s);
+    if (sourceMatch) {
+        citation = sourceMatch[1].trim();
+        const sourceEndIndex = cardString.indexOf(sourceMatch[0]) + sourceMatch[0].length;
+        quote = cardString.substring(sourceEndIndex).trim();
+    } else {
+        // Fallback for older format
+        const shaanIndex = lines.findIndex(line => line.trim().toLowerCase() === 'shaan');
+        if (shaanIndex !== -1) {
+            citation = lines.slice(1, shaanIndex + 1).join('\n').trim();
+            quote = lines.slice(shaanIndex + 1).join('\n').trim();
+        } else {
+            // If all else fails, assume everything after claim is body
+             if (lines.length > 1) {
+                quote = lines.slice(1).join('\n').trim();
+             }
+        }
+    }
+    
+    if (!claim && !citation && !quote) {
+      // If parsing completely fails, treat the whole thing as the quote
+      return { claim: 'No claim found', citation: 'No citation found', quote: cardString };
+    }
+
+    return { claim, citation, quote };
 }
 
 
@@ -94,9 +124,7 @@ export async function runFetchAndExtractEvidence(prevState: FetchState, formData
     if (result && result.card) {
       const parsed = parseCardString(result.card);
       const evidence = [{
-          claim: parsed.tagline,
-          quote: parsed.body,
-          citation: parsed.citation,
+          ...parsed,
           explanation: '',
       }];
       return { evidence, message: null };
@@ -156,9 +184,7 @@ export async function runExtractEvidence(prevState: ExtractState, formData: Form
         if (result && result.card) {
             const parsed = parseCardString(result.card);
             const evidence = [{
-                claim: parsed.tagline,
-                quote: parsed.body,
-                citation: parsed.citation,
+                ...parsed,
                 explanation: 'This evidence was extracted directly from the provided text based on your argument.',
             }];
 
