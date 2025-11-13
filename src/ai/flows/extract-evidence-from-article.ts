@@ -26,7 +26,6 @@ export async function extractEvidence(input: ExtractEvidenceInput): Promise<Extr
 const prompt = ai.definePrompt({
   name: 'extractEvidencePrompt',
   input: {schema: ExtractEvidenceInputSchema},
-  output: {schema: z.string()},
   prompt: `You are a professional debate evidence-cutting assistant trained to create clean, high-impact cards for Public Forum and Policy Debate.
 Your task is to extract the most persuasive, precise, and readable parts of an article and format them so that they can be read word-for-word in a competitive round.
 
