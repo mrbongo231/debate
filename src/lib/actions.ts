@@ -45,38 +45,17 @@ export async function getCongressSpeechAction(
   }
 }
 
-function parseCardString(cardString: string): Omit<EvidenceCardType, 'explanation'> {
-    const boldRegex = /\[BOLD:\s*(.*?)\]/;
-    const sourceRegex = /\[SOURCE:\s*(.*?)\]/;
+function parseCardString(cardString: string): { tagline: string, citation: string, body: string } {
+    const lines = cardString.split('\n');
     
-    const claimMatch = cardString.match(boldRegex);
-    const sourceMatch = cardString.match(sourceRegex);
+    const tagline = lines.find(line => line.startsWith('**') && line.endsWith('**'))?.replace(/\*\*/g, '') || 'No tagline found';
     
-    const claim = claimMatch ? claimMatch[1] : 'No claim found';
-    const rawSource = sourceMatch ? sourceMatch[1] : '';
-
-    const body = cardString.replace(boldRegex, '').replace(sourceRegex, '').trim();
-    const quote = body.replace(/\[HIGHLIGHT:\s*(.*?)\]/g, '<highlight>$1</highlight>');
-
-    return { claim, quote, rawSource };
-}
-
-function parseSourceString(sourceStr: string): Citation {
-    const parts = sourceStr.split(',').map(s => s.trim());
-    const citation: Citation = {};
-    if (parts.length > 0) citation.author = parts[0];
-    if (parts.length > 1) {
-        const yearMatch = parts[1].match(/\d{4}/);
-        if (yearMatch) {
-            citation.date = parts[1];
-        }
-    }
-    if (parts.length > 2) citation.publication = parts[2];
-    if (parts.length > 4) citation.title = parts[4].replace(/"/g, '');
-    const urlMatch = sourceStr.match(/https?:\/\/[^\s,]+/);
-    if (urlMatch) citation.url = urlMatch[0];
+    const citationEndIndex = lines.findIndex(line => line.trim() === 'shaan');
+    const citation = citationEndIndex !== -1 ? lines.slice(1, citationEndIndex + 1).join('\n') : 'No citation found';
     
-    return citation;
+    const body = citationEndIndex !== -1 ? lines.slice(citationEndIndex + 1).join('\n').trim() : cardString;
+
+    return { tagline, citation, body };
 }
 
 
@@ -92,7 +71,7 @@ type FetchState = {
     sourceUrl?: string[];
   };
   message?: string | null;
-  evidence?: (EvidenceCardType & { citation: Citation })[] | null;
+  evidence?: (EvidenceCardType & { citation: string })[] | null;
 };
 
 export async function runFetchAndExtractEvidence(prevState: FetchState, formData: FormData): Promise<FetchState> {
@@ -113,12 +92,12 @@ export async function runFetchAndExtractEvidence(prevState: FetchState, formData
   try {
     const result = await fetchAndExtractEvidenceFlow({ sourceUrl, argument });
     if (result && result.card) {
-      const parsedCard = parseCardString(result.card);
-      const citation = parseSourceString(parsedCard.rawSource || '');
+      const parsed = parseCardString(result.card);
       const evidence = [{
-          ...parsedCard,
+          claim: parsed.tagline,
+          quote: parsed.body,
+          citation: parsed.citation,
           explanation: '',
-          citation: citation
       }];
       return { evidence, message: null };
     } else {
@@ -147,11 +126,11 @@ const extractSchema = z.object({
 type ExtractState = {
     errors?: z.ZodError<z.infer<typeof extractSchema>>['flatten']['fieldErrors'];
     message?: string | null;
-    evidence?: (EvidenceCardType & { citation: Citation })[] | null;
+    evidence?: (EvidenceCardType & { citation: string })[] | null;
 };
 
 export async function runExtractEvidence(prevState: ExtractState, formData: FormData): Promise<ExtractState> {
-    const rawData = {
+    const validatedFields = extractSchema.safeParse({
         articleText: formData.get('articleText'),
         argument: formData.get('argument'),
         citation: {
@@ -161,9 +140,7 @@ export async function runExtractEvidence(prevState: ExtractState, formData: Form
           date: formData.get('citation.date') || undefined,
         },
         sourceUrl: formData.get('sourceUrl'),
-    };
-
-    const validatedFields = extractSchema.safeParse(rawData);
+    });
 
     if (!validatedFields.success) {
         return {
@@ -172,28 +149,21 @@ export async function runExtractEvidence(prevState: ExtractState, formData: Form
         };
     }
 
-    const { articleText, argument, sourceUrl, citation } = validatedFields.data;
+    const { articleText, argument } = validatedFields.data;
     
     try {
         const result = await extractEvidenceFlow({ articleText, argument });
         if (result && result.card) {
-            const parsedCard = parseCardString(result.card);
-            
-            const evidenceWithCitation = [{
-                claim: parsedCard.claim,
-                quote: parsedCard.quote,
+            const parsed = parseCardString(result.card);
+            const evidence = [{
+                claim: parsed.tagline,
+                quote: parsed.body,
+                citation: parsed.citation,
                 explanation: 'This evidence was extracted directly from the provided text based on your argument.',
-                citation: {
-                    author: citation.author || '',
-                    date: citation.date || '',
-                    publication: citation.publication || '',
-                    title: citation.title || 'Manually Provided Text',
-                    url: sourceUrl || '',
-                }
             }];
 
-            if (evidenceWithCitation.length > 0) {
-                return { evidence: evidenceWithCitation, message: null };
+            if (evidence.length > 0) {
+                return { evidence: evidence, message: null };
             }
         }
         return { message: 'No evidence could be extracted from the provided text.', evidence: [] };

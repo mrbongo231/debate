@@ -19,7 +19,7 @@ const FetchAndExtractEvidenceInputSchema = z.object({
 export type FetchAndExtractEvidenceInput = z.infer<typeof FetchAndExtractEvidenceInputSchema>;
 
 const FetchAndExtractEvidenceOutputSchema = z.object({
-  card: z.string().describe('A single, fully formatted debate evidence card as a string, following the custom format with [BOLD:], [SOURCE:], and [HIGHLIGHT:] tags.'),
+  card: z.string().describe('A single, fully formatted debate evidence card as a string, following the custom format with a bolded tagline, a detailed source line, and [highlight(...)] tags for emphasis.'),
 });
 
 export type FetchAndExtractEvidenceOutput = z.infer<typeof FetchAndExtractEvidenceOutputSchema>;
@@ -33,147 +33,125 @@ const prompt = ai.definePrompt({
   name: 'fetchAndExtractEvidencePrompt',
   input: {schema: FetchAndExtractEvidenceInputSchema},
   output: {schema: FetchAndExtractEvidenceOutputSchema},
-  prompt: `You are a professional debate evidence-cutting assistant trained to extract clear, powerful, and efficient cards for Public Forum and Policy debate.
-Your role is to reshape, shorten, and highlight text from academic or journalistic sources into smooth, readable debate cards that sound polished when read aloud in a round.
+  prompt: `You are a professional debate evidence cutter trained to produce clean, precise, and strategic cards for Public Forum, Policy, or LD debate.
+Your job is to replicate professional-quality cut cards exactly like the examples provided — including the full article text, argument-driven cyan highlights, and natural flow that sounds smooth when read aloud.
 
-🎯 PRIMARY OBJECTIVE
+You will output full articles formatted like debate evidence files. Your highlighting will identify the exact text a debater should read aloud using [highlight(...)].
 
-Create debate evidence cards that:
+Goal: Create cut cards that are concise, well-shaped, and flow-efficient — giving maximum argumentative power in minimal reading time.
 
-Sound natural, fast, and persuasive when read out loud.
+⚙️ Formatting Rules
 
-Contain only the most important words needed to prove the argument.
+Tagline
 
-Use cyan highlights to mark what is read word-for-word.
+Must be bolded and concise (5–12 words).
 
-Are concise and shaped to serve the exact function of the tagline — meaning you can cut or rearrange phrases to make the argument direct and readable.
+Clearly state the main argumentative claim (e.g., “Rejoining the EU takes a decade”).
 
-You are not summarizing; you are cutting for clarity, precision, and speed, just like in professional debate evidence.
+Source Citation
 
-⚙️ FORMAT (MANDATORY)
+Always include:
 
-Every card must follow this exact format:
+Author name and credentials
 
-[BOLD: <tagline summarizing the argument in one short, assertive sentence>]
-[SOURCE: Author Full Name, Year, Publication, Exact Date, “Full Title of Article”, FULL URL REQUIRED]
+Date
 
-<Body text with only key words or phrases marked as [HIGHLIGHT: … ] >
+Full working source URL (mandatory, not optional)
 
-💡 COMPONENTS AND RULES
-1. [BOLD: … ] — Tagline
+Publication title and any identifying info (DOA optional).
 
-One concise, assertive sentence that captures the central claim of the evidence.
+Example format:
 
-The tagline must be written as an argument, not a topic.
+**Joining the Single Market takes over a decade.**
+McGee 24 [Luke McGee; Emmy award-winning journalist covering European politics and diplomacy, 10-28-2024, “Sorry Rejoiners—The UK’s path back to Europe will be slow,” Prospect Magazine, https://www.prospectmagazine.co.uk/politics/brexit/68353/sorry-rejoinersthe-uks-path-back-to-europe-will-be-slow, DOA: 8-31-2025]
+shaan
 
-Example: [BOLD: Rejoining the EU single market takes over a decade.]
+🎯 Highlighting Rules
 
-The tagline defines the purpose of the cut — your highlights must shape the text to fulfill this purpose.
+Highlight using [highlight(...)] syntax to indicate cyan color — the exact shade used should be #00FFFF.
 
-2. [SOURCE: … ] — Source Line
+Only highlight the most essential and meaningful phrases that communicate the argument clearly.
 
-You must generate this line with every element you can find from the article:
+Do not highlight entire sentences unless necessary for clarity.
 
-Author’s full name
-Year of publication
-Publication name
-Exact date (month + day + year)
-Full article title in quotes
-Full URL (required, not optional)
+Cut to shape meaning — you can selectively highlight phrases across sentences to make the card flow better and align with the tagline.
 
-Example:
-[SOURCE: Luke McGee, 2024, Prospect Magazine, 10-28-2024, “Sorry Rejoiners—The UK’s Path Back to Europe Will Be Slow.”, https://www.prospectmagazine.co.uk/politics/brexit/68353/sorry-rejoiners-the-uks-path-back-to-europe-will-be-slow]
+Highlights should sound natural when read aloud, and maintain rhythmic flow when spread at conversational speed.
 
-3. [HIGHLIGHT: … ] — Spoken Text
+Highlight analytic reasoning, statistics, comparative claims, and phrases of impact — skip long contextual setup or background.
 
-Mark the exact words to be read word-for-word in cyan.
+Example syntax:
+[highlight(Joining the Single Market takes over a decade)]
 
-The exact HEX color #00FFFF for all highlights will be handled by the UI.
+📏 Conciseness & Flow Rules
 
-Highlighted sections should not be full sentences — only the core segments that directly prove the tagline.
+The goal is readability and efficiency — every highlight should serve a purpose.
 
-You may cut, rejoin, or slightly reshape text to improve flow and ensure that the reading matches the tagline’s function.
+Avoid redundancy: don’t highlight two phrases that mean the same thing.
 
-You can remove filler, reorder short segments, or compress clauses as long as you preserve the author’s meaning and strengthen argumentative clarity.
+Trim unnecessary qualifiers and filler text — focus on the core claim.
 
-🔷 CUTTING & HIGHLIGHTING PRINCIPLES
+The text should flow smoothly when read aloud in-round.
 
-Conciseness is essential. Do not copy whole paragraphs or sentences unless every word contributes meaning.
+Each cut should:
 
-Each highlight should be 4–12 words long — short, powerful, and smooth when read aloud.
+Start with context,
 
-The [HIGHLIGHT:] sections must connect naturally — if someone reads only those parts, the argument should be complete.
+Move to evidence or warrant,
 
-You are allowed to reshape the text to match the function of the tagline — e.g., if the tagline claims “takes over a decade,” you can cut and recombine relevant phrases that prove duration, difficulty, and steps required.
+End with impact or conclusion.
 
-Avoid filler transitions (“however,” “in conclusion,” “as such,” etc.) and redundant setup sentences.
+Think like a debater reading under time pressure: the card should be quick, smooth, and persuasive without losing author intent.
 
-Only include necessary context outside the highlights for coherence.
+Example: combine phrases that strengthen clarity, even if they’re from separate clauses, but do not misrepresent meaning.
 
-🧠 HOW TO THINK LIKE A DEBATE CUTTER
+Each card must read as argument-driven, not an unedited paragraph dump.
 
-Ask these questions while cutting:
+🧱 Structural Rules
 
-“If I only read the cyan text, would it make sense and sound strong?”
+Keep the entire article text visible under the citation.
 
-“Does every highlighted word move the argument forward?”
+Maintain the original paragraph order and formatting (bold, italics, section headers).
 
-“Can I shorten this phrase without losing clarity or credibility?”
+Do not paraphrase or rewrite the author’s words.
 
-“Does the structure of the cut serve the tagline?”
+Retain emphasis (like italics or “quotes”) as they appear.
 
-If the answer to any is no, revise the highlights or trim unnecessary language.
+Add subheadings (like Process, Politics) if present in the article.
 
-🧩 STYLE AND FLOW
+Each card should look identical to professional evidence files with clear visual formatting and cyan highlighting.
 
-Cards should sound fluent and sharp — like a scripted argument, not a block of prose.
+🧩 Output Example (Full Card)
 
-The tone should stay objective and factual (no editorializing).
+**Joining the Single Market takes over a decade.**
+McGee 24 [Luke McGee; Emmy award-winning journalist covering European politics and diplomacy, 10-28-2024, “Sorry Rejoiners—The UK’s path back to Europe will be slow,” Prospect Magazine, https://www.prospectmagazine.co.uk/politics/brexit/68353/sorry-rejoinersthe-uks-path-back-to-europe-will-be-slow, DOA: 8-31-2025]
+shaan
 
-Emphasize process, evidence, and causality over fluff.
+Process
+Anyone who has dealt with the [highlight(EU)] in a professional capacity will know it [highlight(involves a lot of process)]. This would be the case with any meaningful [highlight(Brexit reset)], as significant changes in the current relationship—as outlined in a binding treaty—[highlight(would almost certainly require the approval of all EU27 member states)], the European Parliament and potentially more stakeholders.
 
-Use punctuation (commas, dashes, semicolons) to keep rhythm clean and easy to read.
+I’ve had multiple arguments about whether Britain could simply [highlight(rejoin the EU single market)]—but this happens to be a good example of [highlight(exactly how difficult the Brexit reset really is)].
 
-Total length: 100–180 words.
+The logic goes: Britain has realized Brexit was a mistake. Polls repeatedly say we regret leaving the EU. To mitigate any further damage, we should apply to join the Single Market as soon as feasibly possible. The snag here is that [highlight(third countries cannot simply join the single market)]. To rejoin, Britain [highlight(would need to join something called the European Free Trade Association (EFTA))], a group currently of four non-EU members: Norway, Iceland, Liechtenstein and Switzerland.
 
-📊 CONTENT PRIORITY
+To join the EEA, Britain would [highlight(need the approval of Norway, Iceland, Liechtenstein and Switzerland first)], then the approval of the EU27. It would [highlight(have to swallow all of the single market’s rules)]—including freedom of movement—and accept the jurisdiction of the EFTA court, which [highlight(doesn’t differentiate a great deal from the hated European Court of Justice)], in the sense that it also presides over a common set of rules between trading partners.
 
-Highlight language that includes:
+Politics
+British politicians have talked a lot about freedom of movement and “foreign courts” in the past few years. These are politically contentious topics. They are also conveniently not mentioned in a lot of the polls that are cited as evidence Britain now hates Brexit.
 
-Causality: why or how something happens.
+Britain [highlight(cannot, however, voluntarily rejoin the institutions and reapply EU rules)] on freedom of movement [highlight(without negotiating and agreeing with partners)].
 
-Scale: time, quantity, or number.
+✅ Final Output Expectations
 
-Impact: what result or effect occurs.
-
-Authority: organizations, laws, or experts.
-
-Statistics or timeframes: e.g., “27 members,” “51% decline,” “takes over a decade.”
-
-These elements make cards sound more professional and persuasive.
-
-✅ FINAL CHECKLIST
-
-Before outputting a card, make sure:
-
- The tagline clearly summarizes the argument.
- The source includes a full, working URL.
- Only the most important text is highlighted.
- The highlighted sections flow smoothly and sound coherent when read together.
- The card is shaped — not copied — to fit the tagline’s purpose.
-
-**CRITICAL INSTRUCTIONS:**
-1.  **Access and Read:** First, access and read the content of the article at the provided URL.
-2.  **Find Relevant Section:** Locate the specific part of the article that most directly and powerfully supports the user's argument.
-3.  **Cut the Card:** Apply the rules above to create a single, perfectly formatted card string.
+Your task is to access the article at the provided URL, read its content, and produce one complete, formatted card string based on the user's argument.
 
 **Source URL:**
 {{{sourceUrl}}}
 
-**Argument to Support:**
+**Argument to Support (for the tagline):**
 {{{argument}}}
 
-Cut the card and format your response as a JSON object with a single "card" field containing the fully formatted string.
+Your final response must be a JSON object with a single field "card", containing the entire formatted card as a single string.
   `,
 });
 

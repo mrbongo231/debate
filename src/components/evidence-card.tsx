@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import type { EvidenceCard as EvidenceCardType, Citation } from '@/lib/definitions';
+import type { EvidenceCard as EvidenceCardType } from '@/lib/definitions';
 import {
   Card,
   CardContent,
@@ -14,85 +14,36 @@ import { Button } from '@/components/ui/button';
 import { Save, Copy } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useTheme } from 'next-themes';
-import { format } from 'date-fns';
 
 interface EvidenceCardProps {
-  evidence: EvidenceCardType;
-  argument: string;
-  source?: string;
-  citation: Citation;
+  evidence: EvidenceCardType & { citation: string };
   highlightColor?: string;
 }
 
-export function EvidenceCard({ evidence, argument, source, citation, highlightColor = 'cyan' }: EvidenceCardProps) {
+export function EvidenceCard({ evidence, highlightColor = '#00FFFF' }: EvidenceCardProps) {
   const { toast } = useToast();
   const [isSaved, setIsSaved] = useState(false);
   const { theme } = useTheme();
   const isDark = theme === 'dark';
 
-  const highlightStyles: { [key: string]: { light: string; dark: string } } = {
-    cyan: { light: 'rgba(0, 255, 255, 0.3)', dark: 'rgba(0, 255, 250, 0.4)' },
-    green: { light: 'rgba(50, 255, 50, 0.4)', dark: 'rgba(50, 255, 50, 0.5)' },
-    yellow: { light: 'rgba(255, 255, 0, 0.4)', dark: 'rgba(255, 255, 0, 0.5)' },
-    pink: { light: 'rgba(244, 114, 182, 0.3)', dark: 'rgba(244, 114, 182, 0.4)' },
-  };
-
-  const getHighlightColor = () => {
-    const colorSet = highlightStyles[highlightColor] || highlightStyles.cyan;
-    return isDark ? colorSet.dark : colorSet.light;
+  const getHighlightCss = () => {
+    // Using a more transparent color for better readability
+    const color = highlightColor;
+    const alpha = isDark ? '40' : '30'; // 40% opacity for dark, 30% for light
+    return `${color}${alpha}`;
   };
   
-  const formatCitation = (cit: Citation, rawSource?: string) => {
-    if (rawSource) {
-        return rawSource;
-    }
-
-    if (!cit.author && !cit.title) {
-        return source || 'No citation provided.';
-    }
-    const doa = format(new Date(), 'M-d-yyyy');
-    let year = 'N/A';
-    if(cit.date) {
-        try {
-            year = new Date(cit.date.replace(/-/g, '/')).getFullYear().toString().slice(-2);
-        } catch(e) {/* ignore invalid date */}
-    }
-
-    const authorLastName = cit.author?.split(' ').pop() || '';
-    
-    let dateFormatted = '';
-    if (cit.date) {
-        try {
-            dateFormatted = format(new Date(cit.date.replace(/-/g, '/')), 'M-d-yyyy');
-        } catch (e) {
-            // keep it empty if date is invalid
-        }
-    }
-    
-    let citationString = `${authorLastName} ${year} [`;
-    citationString += `${cit.author || ''}`;
-    if (cit.title) citationString += `, "${cit.title}"`;
-    if (cit.publication) citationString += `, ${cit.publication}`;
-    if (dateFormatted) citationString += `, ${dateFormatted}`;
-    if (source) citationString += `, ${source}`;
-    citationString += `, DOA: ${doa}]`;
-
-    return citationString.replace(/, ,/g, ',').replace(/\[, /g, '[').trim();
-  };
-
-  const fullCitationText = formatCitation(citation, evidence.rawSource);
-
   const handleSave = () => {
+    // This function can be expanded to save to a database or other persistent storage
     try {
       const savedEvidence = JSON.parse(localStorage.getItem('evidenceLibrary') || '[]');
       const newCard = {
-        argument: evidence.claim,
-        card: evidence.quote, 
-        source: source || citation.url || "N/A",
-        citation: fullCitationText
+        claim: evidence.claim,
+        quote: evidence.quote, 
+        citation: evidence.citation,
       };
       
-      const isDuplicate = savedEvidence.some((card: any) => card.card === newCard.card && card.argument === newCard.argument);
+      const isDuplicate = savedEvidence.some((card: any) => card.quote === newCard.quote && card.claim === newCard.claim);
 
       if (!isDuplicate) {
         savedEvidence.push(newCard);
@@ -100,7 +51,7 @@ export function EvidenceCard({ evidence, argument, source, citation, highlightCo
         setIsSaved(true);
         toast({
           title: 'Card Saved!',
-          description: 'This evidence card has been added to your library.',
+          description: 'This evidence card has been added to your local library.',
         });
       } else {
         setIsSaved(true);
@@ -122,13 +73,13 @@ export function EvidenceCard({ evidence, argument, source, citation, highlightCo
   const handleCopy = () => {
     const cardHtml = `
       <p><b>${evidence.claim}</b></p>
-      <p><i>${fullCitationText}</i></p>
+      <pre style="white-space: pre-wrap; font-family: monospace;">${evidence.citation}</pre>
       <p>${
-        evidence.quote.replace(/<highlight>/g, `<span style="background-color: ${getHighlightColor()};">`).replace(/<\/highlight>/g, '</span>')
+        evidence.quote.replace(/\[highlight\((.*?)\)\]/g, `<span style="background-color: ${getHighlightCss()};">$1</span>`)
       }</p>
     `;
 
-    const plainText = `${evidence.claim}\n${fullCitationText}\n\n${evidence.quote.replace(/<\/?highlight>/g, '')}`;
+    const plainText = `${evidence.claim}\n${evidence.citation}\n\n${evidence.quote.replace(/\[highlight\((.*?)\)\]/g, '$1')}`;
 
     try {
       const blob = new Blob([cardHtml], { type: 'text/html' });
@@ -151,13 +102,13 @@ export function EvidenceCard({ evidence, argument, source, citation, highlightCo
   };
 
   const renderHighlightedCard = (card: string) => {
-    const parts = card.split(/(<highlight>.*?<\/highlight>)/g);
+    const parts = card.split(/(\[highlight\(.*?\)\])/g);
     return (
-      <p className="text-sm/relaxed font-code">
+      <p className="text-sm/relaxed">
         {parts.map((part, i) =>
-          part.startsWith('<highlight>') ? (
-            <span key={i} className="font-bold" style={{ backgroundColor: getHighlightColor() }}>
-              {part.replace(/<\/?highlight>/g, '')}
+          part.startsWith('[highlight(') ? (
+            <span key={i} style={{ backgroundColor: getHighlightCss() }}>
+              {part.substring(10, part.length - 2)}
             </span>
           ) : (
             part
@@ -168,32 +119,30 @@ export function EvidenceCard({ evidence, argument, source, citation, highlightCo
   };
 
   return (
-    <>
-      <Card className={`${isDark ? 'bg-gradient-to-br from-gray-900/80 to-purple-900/30 backdrop-blur-lg border border-purple-500/30' : 'bg-card border-border'}`}>
-        <CardHeader>
-          <CardTitle className="text-lg font-bold text-primary">{evidence.claim}</CardTitle>
-           <CardDescription className="text-xs">
-            {fullCitationText}
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <blockquote className={`border-l-4 pl-4 ${isDark ? 'border-cyan-400' : 'border-primary'}`}>
+    <Card className={`${isDark ? 'bg-gradient-to-br from-gray-900/80 to-purple-900/30 backdrop-blur-lg border border-purple-500/30' : 'bg-card border-border'}`}>
+      <CardHeader>
+        <CardTitle className="text-lg font-bold text-primary">{evidence.claim}</CardTitle>
+         <CardDescription className="text-xs whitespace-pre-wrap font-mono">
+          {evidence.citation}
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        <blockquote className={`border-l-4 pl-4 ${isDark ? 'border-cyan-400' : 'border-primary'}`}>
             <div className={`${isDark ? 'bg-black/40' : 'bg-muted'} p-3 rounded-r-md`}>
                 {renderHighlightedCard(evidence.quote)}
             </div>
-          </blockquote>
-        </CardContent>
-        <CardFooter className="flex justify-end gap-2">
-          <Button variant="outline" onClick={handleCopy}>
-            <Copy className="mr-2 h-4 w-4" />
-            Copy
-          </Button>
-          <Button onClick={handleSave} disabled={isSaved}>
-            <Save className="mr-2 h-4 w-4" />
-            {isSaved ? 'Saved' : 'Save to Library'}
-          </Button>
-        </CardFooter>
-      </Card>
-    </>
+        </blockquote>
+      </CardContent>
+      <CardFooter className="flex justify-end gap-2">
+        <Button variant="outline" onClick={handleCopy}>
+          <Copy className="mr-2 h-4 w-4" />
+          Copy
+        </Button>
+        <Button onClick={handleSave} disabled={isSaved}>
+          <Save className="mr-2 h-4 w-4" />
+          {isSaved ? 'Saved' : 'Save to Library'}
+        </Button>
+      </CardFooter>
+    </Card>
   );
 }

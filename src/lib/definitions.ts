@@ -2,7 +2,7 @@ export type EvidenceCard = {
   claim: string;
   quote: string;
   explanation: string;
-  rawSource?: string;
+  citation: string;
 };
 
 export type Citation = {
