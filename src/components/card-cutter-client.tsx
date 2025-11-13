@@ -47,33 +47,21 @@ const textFormSchema = z.object({
 });
 
 
-function UrlSubmitButton() {
+function SubmitButton() {
   const { pending } = useFormStatus();
   return (
     <Button type="submit" disabled={pending} className={`w-full font-bold`}>
       {pending ? (
         <LoaderCircle className="animate-spin" />
       ) : (
-        <Scissors className="mr-2" />
+        <>
+          <Scissors className="mr-2" />
+          Cut Cards
+        </>
       )}
-      Cut Cards
     </Button>
   );
 }
-
-function TextSubmitButton() {
-    const { pending } = useFormStatus();
-    return (
-      <Button type="submit" disabled={pending} className={`w-full font-bold`}>
-        {pending ? (
-          <LoaderCircle className="animate-spin" />
-        ) : (
-          <Scissors className="mr-2" />
-        )}
-        Cut Cards
-      </Button>
-    );
-  }
 
 export function CardCutterClient() {
   const { toast } = useToast();
@@ -97,9 +85,17 @@ export function CardCutterClient() {
   });
 
   const [activeTab, setActiveTab] = useState('url');
-  const [lastSubmittedTab, setLastSubmittedTab] = useState('');
   
-  const state = lastSubmittedTab === 'url' ? urlState : textState;
+  // Use a unified state that updates based on the most recent action.
+  const [activeState, setActiveState] = useState({ message: null, evidence: null });
+
+  useEffect(() => {
+    if (urlState.message || urlState.evidence) setActiveState(urlState);
+  }, [urlState]);
+
+  useEffect(() => {
+    if (textState.message || textState.evidence) setActiveState(textState);
+  }, [textState]);
 
   const urlForm = useForm<z.infer<typeof urlFormSchema>>({
     resolver: zodResolver(urlFormSchema),
@@ -123,14 +119,14 @@ export function CardCutterClient() {
   });
 
   useEffect(() => {
-    if (state?.message && (!state.evidence || state.evidence.length === 0)) {
+    if (activeState?.message && (!activeState.evidence || activeState.evidence.length === 0)) {
       toast({
         variant: 'destructive',
         title: 'An error occurred',
-        description: state.message,
+        description: activeState.message,
       });
     }
-  }, [state, toast]);
+  }, [activeState, toast]);
 
   const argument = activeTab === 'url' ? urlForm.getValues('argument') : textForm.getValues('argument');
   const source = activeTab === 'url' ? urlForm.getValues('sourceUrl') : textForm.getValues('sourceUrl');
@@ -157,8 +153,7 @@ export function CardCutterClient() {
             <TabsContent value="url">
               <Form {...urlForm}>
                 <form 
-                  action={urlFormAction} 
-                  onSubmit={urlForm.handleSubmit(() => setLastSubmittedTab('url'))}
+                  action={urlFormAction}
                   className="space-y-6 pt-4"
                 >
                   <FormField
@@ -187,7 +182,7 @@ export function CardCutterClient() {
                       </FormItem>
                     )}
                   />
-                  <UrlSubmitButton />
+                  <SubmitButton />
                 </form>
               </Form>
             </TabsContent>
@@ -195,7 +190,6 @@ export function CardCutterClient() {
                 <Form {...textForm}>
                 <form 
                   action={textFormAction} 
-                  onSubmit={textForm.handleSubmit(() => setLastSubmittedTab('text'))} 
                   className="space-y-6 pt-4"
                 >
                     <FormField
@@ -298,7 +292,7 @@ export function CardCutterClient() {
                             </div>
                         </CardContent>
                     </Card>
-                    <TextSubmitButton />
+                    <SubmitButton />
                 </form>
                 </Form>
             </TabsContent>
@@ -313,9 +307,9 @@ export function CardCutterClient() {
             <div className="space-y-4">
               <Skeleton className={`h-48 w-full ${isDark ? 'bg-gray-800/50' : 'bg-muted'}`} />
             </div>
-          ) : state?.evidence && state.evidence.length > 0 ? (
+          ) : activeState?.evidence && activeState.evidence.length > 0 ? (
             <div className="max-h-[60vh] overflow-y-auto scroll-fade p-2 -m-2 space-y-4">
-              {state.evidence.map((ev, index) => (
+              {activeState.evidence.map((ev, index) => (
                 <EvidenceCard
                   key={index}
                   evidence={ev}
