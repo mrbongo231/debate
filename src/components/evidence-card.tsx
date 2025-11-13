@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import type { EvidenceCard as EvidenceCardType } from '@/lib/definitions';
+import type { EvidenceCard as EvidenceCardType, Citation } from '@/lib/definitions';
 import {
   Card,
   CardContent,
@@ -27,14 +27,12 @@ export function EvidenceCard({ evidence, highlightColor = '#00FFFF' }: EvidenceC
   const isDark = theme === 'dark';
 
   const getHighlightCss = () => {
-    // Using a more transparent color for better readability
     const color = highlightColor;
     const alpha = isDark ? '40' : '30'; // 40% opacity for dark, 30% for light
     return `${color}${alpha}`;
   };
   
   const handleSave = () => {
-    // This function can be expanded to save to a database or other persistent storage
     try {
       const savedEvidence = JSON.parse(localStorage.getItem('evidenceLibrary') || '[]');
       const newCard = {
@@ -104,7 +102,7 @@ export function EvidenceCard({ evidence, highlightColor = '#00FFFF' }: EvidenceC
   const renderHighlightedCard = (card: string) => {
     const parts = card.split(/(\[highlight\((?:.|\n)*?\)\])/g);
     return (
-      <p className="text-sm/relaxed">
+      <p className="text-sm/relaxed whitespace-pre-wrap">
         {parts.map((part, i) =>
           part.startsWith('[highlight(') ? (
             <span key={i} style={{ backgroundColor: getHighlightCss() }}>

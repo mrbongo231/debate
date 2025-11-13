@@ -45,39 +45,34 @@ export async function getCongressSpeechAction(
 }
 
 function parseCardString(cardString: string): { claim: string; citation: string; quote: string } | null {
-    const boldMatch = cardString.match(/\[BOLD:\s*([\s\S]*?)\]/);
-    const sourceMatch = cardString.match(/\[SOURCE:\s*([\s\S]*?)\]/);
+  if (!cardString || typeof cardString !== 'string') return null;
 
-    if (!boldMatch || !sourceMatch) {
-        // Fallback for old format or malformed new format
-        const lines = cardString.trim().split('\n');
-        let claim = '';
-        let citation = '';
-        let quote = '';
+  const boldRegex = /\[BOLD:\s*([\s\S]*?)\]/;
+  const sourceRegex = /\[SOURCE:\s*([\s\S]*?)\]/;
 
-        if (lines[0] && !lines[0].includes('[SOURCE:')) {
-            claim = lines.shift()?.replace(/\*\*/g, '').trim() || '';
-        }
-        
-        const shaanIndex = lines.findIndex(line => line.trim().toLowerCase() === 'shaan');
-        if (shaanIndex !== -1) {
-            citation = lines.slice(0, shaanIndex + 1).join('\n').trim();
-            quote = lines.slice(shaanIndex + 1).join('\n').trim();
-        } else {
-            quote = lines.join('\n').trim();
-        }
+  const boldMatch = cardString.match(boldRegex);
+  const sourceMatch = cardString.match(sourceRegex);
 
-        if (!claim && !citation && !quote) return null;
-        return { claim, citation, quote };
-    }
+  if (!boldMatch || !sourceMatch) {
+    // Fallback for older or malformed format
+    const lines = cardString.trim().split('\n');
+    const claim = lines.find(line => !line.startsWith('McGee 24'))?.replace(/\*\*/g, '').trim() || 'Argument';
+    const citation = lines.find(line => line.startsWith('McGee 24')) || 'No citation provided.';
+    const quoteIndex = lines.findIndex(line => line.trim().toLowerCase() === 'shaan');
+    const quote = quoteIndex !== -1 ? lines.slice(quoteIndex + 1).join('\n').trim() : lines.slice(1).join('\n').trim();
 
-    const claim = boldMatch[1].trim();
-    const citation = sourceMatch[1].trim();
-
-    const sourceEndIndex = cardString.indexOf(sourceMatch[0]) + sourceMatch[0].length;
-    const quote = cardString.substring(sourceEndIndex).trim();
-
+    if (!quote) return null;
     return { claim, citation, quote };
+  }
+
+  const claim = boldMatch[1].trim();
+  const citation = sourceMatch[1].trim();
+
+  // The quote is everything after the [SOURCE:...] tag
+  const sourceEndIndex = cardString.indexOf(sourceMatch[0]) + sourceMatch[0].length;
+  const quote = cardString.substring(sourceEndIndex).trim();
+
+  return { claim, citation, quote };
 }
 
 
@@ -113,9 +108,10 @@ export async function runFetchAndExtractEvidence(prevState: FetchState, formData
 
   try {
     const result = await fetchAndExtractEvidenceFlow({ sourceUrl, argument });
-    if (result && result.card) {
-      const parsed = parseCardString(result.card);
+    if (result) {
+      const parsed = parseCardString(result);
       if (!parsed) {
+        console.error("Failed to parse card string:", result);
         return { message: 'Failed to parse the evidence returned from the AI. The format was incorrect.', evidence: [] };
       }
       const evidence = [{
@@ -176,9 +172,10 @@ export async function runExtractEvidence(prevState: ExtractState, formData: Form
     
     try {
         const result = await extractEvidenceFlow({ articleText, argument });
-        if (result && result.card) {
-            const parsed = parseCardString(result.card);
+        if (result) {
+            const parsed = parseCardString(result);
              if (!parsed) {
+                console.error("Failed to parse card string:", result);
                 return { message: 'Failed to parse the evidence returned from the AI. The format was incorrect.', evidence: [] };
             }
             const evidence = [{
