@@ -102,7 +102,7 @@ export function EvidenceCard({ evidence, highlightColor = '#00FFFF' }: EvidenceC
   };
 
   const renderHighlightedCard = (card: string) => {
-    const parts = card.split(/(\[highlight\(.*?\)\])/g);
+    const parts = card.split(/(\[highlight\((?:.|\n)*?\)\])/g);
     return (
       <p className="text-sm/relaxed">
         {parts.map((part, i) =>
