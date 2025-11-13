@@ -40,122 +40,17 @@ Goal: Create cut cards that are concise, well-shaped, and flow-efficient — giv
 **User Provided Argument (for the tagline):**
 {{{argument}}}
 
-⚙️ Formatting Rules
+**COMPONENT BREAKDOWN**
+1.  **[BOLD: …] — Tagline**: A single, clear, assertive sentence summarizing the main argument. Example: '[BOLD: Rejoining the EU single market takes over a decade.]'
+2.  **[SOURCE: …] — Source Line**: Include every element: Author’s full name, Year, Publication name, Exact date (month-day-year), Full article title in quotes, and the Full URL.
+    Example: '[SOURCE: Luke McGee, 2024, Prospect Magazine, 10-28-2024, “Sorry Rejoiners—The UK’s Path Back to Europe Will Be Slow.”, https://www.prospectmagazine.co.uk/politics/brexit/68353/sorry-rejoiners-the-uks-path-back-to-europe-will-be-slow]'
+3.  **[highlight(...)] — Spoken Text**: This marks the exact language the debater will read aloud. Only highlight the most essential phrases. The highlights should flow together seamlessly. Use '[highlight(some text)]' syntax.
 
-Tagline
-
-Must be bolded and concise (5–12 words).
-
-Clearly state the main argumentative claim (e.g., 'Rejoining the EU takes a decade').
-
-Source Citation
-
-Always include:
-
-Author name and credentials
-
-Date
-
-Full working source URL (mandatory, not optional)
-
-Publication title and any identifying info (DOA optional).
-
-Example format:
-
-Joining the Single Market takes over a decade.
-McGee 24 [Luke McGee; Emmy award-winning journalist covering European politics and diplomacy, 10-28-2024, 'Sorry Rejoiners—The UK’s path back to Europe will be slow,' Prospect Magazine, https://www.prospectmagazine.co.uk/politics/brexit/68353/sorry-rejoinersthe-uks-path-back-to-europe-will-be-slow
-, DOA: 8-31-2025]
-shaan
-
-🎯 Highlighting Rules
-
-Highlight using [highlight(...)] syntax to indicate cyan color — the exact shade used should be #00FFFF.
-
-Only highlight the most essential and meaningful phrases that communicate the argument clearly.
-
-Do not highlight entire sentences unless necessary for clarity.
-
-Cut to shape meaning — you can selectively highlight phrases across sentences to make the card flow better and align with the tagline.
-
-Highlights should sound natural when read aloud, and maintain rhythmic flow when spread at conversational speed.
-
-Highlight analytic reasoning, statistics, comparative claims, and phrases of impact — skip long contextual setup or background.
-
-Example syntax:
-[highlight(Joining the Single Market takes over a decade)]
-
-📏 Conciseness & Flow Rules
-
-The goal is readability and efficiency — every highlight should serve a purpose.
-
-Avoid redundancy: don’t highlight two phrases that mean the same thing.
-
-Trim unnecessary qualifiers and filler text — focus on the core claim.
-
-The text should flow smoothly when read aloud in-round.
-
-Each cut should:
-
-Start with context,
-
-Move to evidence or warrant,
-
-End with impact or conclusion.
-
-Think like a debater reading under time pressure: the card should be quick, smooth, and persuasive without losing author intent.
-
-Example: combine phrases that strengthen clarity, even if they’re from separate clauses, but do not misrepresent meaning.
-
-Each card must read as argument-driven, not an unedited paragraph dump.
-
-🧱 Structural Rules
-
-Keep the entire article text visible under the citation.
-
-Maintain the original paragraph order and formatting (bold, italics, section headers).
-
-Do not paraphrase or rewrite the author’s words.
-
-Retain emphasis (like italics or 'quotes') as they appear.
-
-Add subheadings (like Process, Politics) if present in the article.
-
-Each card should look identical to professional evidence files with clear visual formatting and cyan highlighting.
-
-🧩 Output Example (Full Card)
-
-Joining the Single Market takes over a decade.
-McGee 24 [Luke McGee; Emmy award-winning journalist covering European politics and diplomacy, 10-28-2024, 'Sorry Rejoiners—The UK’s path back to Europe will be slow,' Prospect Magazine, https://www.prospectmagazine.co.uk/politics/brexit/68353/sorry-rejoinersthe-uks-path-back-to-europe-will-be-slow
-, DOA: 8-31-2025]
-shaan
-
-Process
-Anyone who has dealt with the [highlight(EU)] in a professional capacity will know it [highlight(involves a lot of process)]. This would be the case with any meaningful [highlight(Brexit reset)], as significant changes in the current relationship—as outlined in a binding treaty—[highlight(would almost certainly require the approval of all EU27 member states)], the European Parliament and potentially more stakeholders.
-
-I’ve had multiple arguments about whether Britain could simply [highlight(rejoin the EU single market)]—but this happens to be a good example of [highlight(exactly how difficult the Brexit reset really is)].
-
-The logic goes: Britain has realized Brexit was a mistake. Polls repeatedly say we regret leaving the EU. To mitigate any further damage, we should apply to join the Single Market as soon as feasibly possible. The snag here is that [highlight(third countries cannot simply join the single market)]. To rejoin, Britain [highlight(would need to join something called the European Free Trade Association (EFTA))], a group currently of four non-EU members: Norway, Iceland, Liechtenstein and Switzerland.
-
-To join the EEA, Britain would [highlight(need the approval of Norway, Iceland, Liechtenstein and Switzerland first)], then the approval of the EU27. It would [highlight(have to swallow all of the single market’s rules)]—including freedom of movement—and accept the jurisdiction of the EFTA court, which [highlight(doesn’t differentiate a great deal from the hated European Court of Justice)], in the sense that it also presides over a common set of rules between trading partners.
-
-Politics
-British politicians have talked a lot about freedom of movement and 'foreign courts' in the past few years. These are politically contentious topics. They are also conveniently not mentioned in a lot of the polls that are cited as evidence Britain now hates Brexit.
-
-Britain [highlight(cannot, however, voluntarily rejoin the institutions and reapply EU rules)] on freedom of movement [highlight(without negotiating and agreeing with partners)].
-
-✅ Final Output Expectations
-
-Each final card must:
-
-Include bold tagline and full source
-
-Use [highlight(...)] syntax for cyan emphasis
-
-Contain the full original article text
-
-Read in a concise, argument-optimized flow
-
-Maintain professional visual formatting
+**Styling and Rules**
+-   **Highlight Color**: Use the exact HEX code #00FFFF for all cyan highlights.
+-   **Conciseness**: Avoid redundancy. Trim unnecessary qualifiers and filler. Every highlighted word must serve a purpose.
+-   **Flow**: The highlighted text should sound natural when read aloud in sequence. Cut and shape the author's sentences to achieve this, but do not misrepresent their meaning.
+-   **Structure**: Keep the entire original article text. Do not paraphrase. Retain original formatting like bold or italics where present.
 
 Your goal is to make each cut sound like it could be read in-round by a top national circuit debater: clean, persuasive, efficient, and crystal clear.
 `,
@@ -168,11 +63,7 @@ const extractEvidenceFlow = ai.defineFlow(
     outputSchema: z.string(),
   },
   async input => {
-    const {text} = await ai.generate({
-        prompt: prompt,
-        input: input,
-        model: 'googleai/gemini-2.5-flash',
-    });
-    return text;
+    const { output } = await prompt(input);
+    return output!;
   }
 );
