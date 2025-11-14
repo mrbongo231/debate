@@ -17,7 +17,10 @@ const ExtractEvidenceInputSchema = z.object({
 });
 export type ExtractEvidenceInput = z.infer<typeof ExtractEvidenceInputSchema>;
 
-export type ExtractEvidenceOutput = { card: string };
+const ExtractEvidenceOutputSchema = z.object({
+  card: z.string(),
+});
+export type ExtractEvidenceOutput = z.infer<typeof ExtractEvidenceOutputSchema>;
 
 export async function extractEvidence(input: ExtractEvidenceInput): Promise<ExtractEvidenceOutput> {
   return extractEvidenceFlow(input);
@@ -26,10 +29,10 @@ export async function extractEvidence(input: ExtractEvidenceInput): Promise<Extr
 const prompt = ai.definePrompt({
   name: 'extractEvidencePrompt',
   input: {schema: ExtractEvidenceInputSchema},
-  output: { schema: z.object({ card: z.string() }) },
+  output: {schema: ExtractEvidenceOutputSchema },
   prompt: `You are a professional debate evidence-cutting assistant trained to create clean, high-impact cards for Public Forum and Policy Debate.
 Your task is to extract the most persuasive, precise, and readable parts of an article and format them so that they can be read word-for-word in a competitive round.
-Your output must be a single string containing the fully formatted card.
+Your output must be a single JSON object with a "card" property containing the fully formatted card as a string.
 
 **User Provided Article Text:**
 {{{articleText}}}
@@ -57,10 +60,10 @@ const extractEvidenceFlow = ai.defineFlow(
   {
     name: 'extractEvidenceFlow',
     inputSchema: ExtractEvidenceInputSchema,
-    outputSchema: z.object({ card: z.string() }),
+    outputSchema: ExtractEvidenceOutputSchema,
   },
   async input => {
-    const output = await prompt(input);
+    const { output } = await prompt(input);
     return output || { card: '' };
   }
 );

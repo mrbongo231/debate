@@ -18,7 +18,10 @@ const FetchAndExtractEvidenceInputSchema = z.object({
 
 export type FetchAndExtractEvidenceInput = z.infer<typeof FetchAndExtractEvidenceInputSchema>;
 
-export type FetchAndExtractEvidenceOutput = { card: string };
+const FetchAndExtractEvidenceOutputSchema = z.object({
+  card: z.string(),
+});
+export type FetchAndExtractEvidenceOutput = z.infer<typeof FetchAndExtractEvidenceOutputSchema>;
 
 
 export async function fetchAndExtractEvidence(input: FetchAndExtractEvidenceInput): Promise<FetchAndExtractEvidenceOutput> {
@@ -28,7 +31,7 @@ export async function fetchAndExtractEvidence(input: FetchAndExtractEvidenceInpu
 const prompt = ai.definePrompt({
   name: 'fetchAndExtractEvidencePrompt',
   input: {schema: FetchAndExtractEvidenceInputSchema},
-  output: { schema: z.object({ card: z.string() }) },
+  output: { schema: FetchAndExtractEvidenceOutputSchema },
   prompt: `You are a professional debate evidence cutter trained to produce clean, precise, and strategic cards for Public Forum, Policy, or LD debate.
 Your job is to access the provided URL, read the article, and replicate professional-quality cut cards exactly like the examples provided — including the full article text, argument-driven cyan highlights, and natural flow that sounds smooth when read aloud.
 Your output must be a single string inside a JSON object: { "card": "..." }. The string should contain the fully formatted card.
@@ -63,10 +66,10 @@ const fetchAndExtractEvidenceFlow = ai.defineFlow(
   {
     name: 'fetchAndExtractEvidenceFlow',
     inputSchema: FetchAndExtractEvidenceInputSchema,
-    outputSchema: z.object({ card: z.string() }),
+    outputSchema: FetchAndExtractEvidenceOutputSchema,
   },
   async input => {
-    const output = await prompt(input);
+    const { output } = await prompt(input);
     return output || { card: '' };
   }
 );
