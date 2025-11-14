@@ -32,13 +32,7 @@ const prompt = ai.definePrompt({
   name: 'fetchAndExtractEvidencePrompt',
   input: {schema: FetchAndExtractEvidenceInputSchema},
   output: { schema: FetchAndExtractEvidenceOutputSchema },
-  prompt: `You are a professional debate evidence cutter trained to produce clean, precise, and strategic cards for Public Forum, Policy, or LD debate.
-Your job is to access the provided URL, read the article, and replicate professional-quality cut cards exactly like the examples provided — including the full article text, argument-driven cyan highlights, and natural flow that sounds smooth when read aloud.
-Your output must be a single string inside a JSON object: { "card": "..." }. The string should contain the fully formatted card.
-
-You will output full articles formatted like debate evidence files. Your highlighting will identify the exact text a debater should read aloud using [highlight(...)].
-
-Goal: Create cut cards that are concise, well-shaped, and flow-efficient — giving maximum argumentative power in minimal reading time.
+  prompt: `You are a professional debate evidence cutter. Your job is to access the provided URL, read the article, and cut cards exactly like the high-quality examples provided, with concise, shaped highlights, professional formatting, clean flow, and full source material included. Your final output must be a single JSON object with a "card" property containing the fully formatted card as a string.
 
 **Source URL:**
 {{{sourceUrl}}}
@@ -46,19 +40,34 @@ Goal: Create cut cards that are concise, well-shaped, and flow-efficient — giv
 **User Provided Argument (for the tagline):**
 {{{argument}}}
 
-**COMPONENT BREAKDOWN**
-1.  **[BOLD: …] — Tagline**: A single, clear, assertive sentence summarizing the main argument. Example: '[BOLD: Rejoining the EU single market takes over a decade.]'
-2.  **[SOURCE: …] — Source Line**: You MUST create this based on the article's metadata. Include every element: Author’s full name, Year, Publication name, Exact date (month-day-year), Full article title in quotes, and the Full URL.
-    Example: '[SOURCE: Luke McGee, 2024, Prospect Magazine, 10-28-2024, "Sorry Rejoiners—The UK’s Path Back to Europe Will Be Slow.", https://www.prospectmagazine.co.uk/politics/brexit/68353/sorry-rejoiners-the-uks-path-back-to-europe-will-be-slow]'
-3.  **[highlight(...)] — Spoken Text**: This marks the exact language the debater will read aloud. Only highlight the most essential phrases. The highlights should flow together seamlessly. Use '[highlight(some text)]' syntax.
+**🎯 RULE 1 — Tagline Formatting (MANDATORY)**
 
-**Styling and Rules**
--   **Highlight Color**: Use the exact HEX code #00FFFF for all cyan highlights.
--   **Conciseness**: Avoid redundancy. Trim unnecessary qualifiers and filler. Every highlighted word must serve a purpose.
--   **Flow**: The highlighted text should sound natural when read aloud in sequence. Cut and shape the author's sentences to achieve this, but do not misrepresent their meaning.
--   **Structure**: Keep the entire original article text. Do not paraphrase. Retain original formatting like bold or italics where present.
+Every card must begin with:
 
-Your goal is to make each cut sound like it could be read in-round by a top national circuit debater: clean, persuasive, efficient, and crystal clear.
+1. A bold, concise tagline (5–12 words) summarizing the argument.
+2. On a new line, the citation: Author Last Name YY [Full Name; Credentials (if available), MM-DD-YYYY, “Article Title,” Publication, Full URL (REQUIRED), DOA: MM-DD-YYYY] cutter_initials
+
+Format example:
+Joining the Single Market takes over a decade.
+McGee 24 [Luke McGee; Emmy award-winning journalist covering European politics and diplomacy, 10-28-2024, “Sorry Rejoiners—The UK’s path back to Europe will be slow,” Prospect Magazine, https://www.prospectmagazine.co.uk/politics/brexit/68353/sorry-rejoinersthe-uks-path-back-to-europe-will-be-slow, DOA: 8-31-2025] shaan
+
+**🎯 RULE 2 — Cyan Highlighting With [highlight(...)]**
+
+All highlighting must use [highlight(...)] syntax. The highlight represents cyan (#00FFFF). Only highlight short, powerful phrases, NOT whole sentences. Every highlight must be shaped to improve argumentative flow. Highlight core claims, causal mechanisms, statistics, warrants, and impacts. Do NOT highlight full paragraphs or bold random text.
+
+**🎯 RULE 3 — Conciseness and Flow**
+
+Your goal is to make the card clean, professional, concise but not choppy, and shaped for in-round readability. The highlights must read smoothly when spoken.
+
+**🎯 RULE 4 — Full Article Appears Below the Cite (MANDATORY)**
+
+You must ALWAYS print the entire article text after the citation. Keep the original paragraph structure and any bold/italic formatting. Insert [highlight(...)] markings directly into the full text.
+
+**🎯 RULE 5 — Bold Detection Rule**
+
+Because pasted text may lose formatting, you must infer where the title, headers, and bolded elements were originally placed and reconstruct them. Reconstruct bold headers such as "Process," "Analysis," "Conclusion," etc.
+
+Your final product must look exactly like a professional debate evidence file.
 `,
 });
 
