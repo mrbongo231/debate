@@ -57,8 +57,13 @@ function parseCardString(cardString: string): { claim: string; citation: string;
 
   const claim = claimMatch[1].trim();
   const citation = sourceMatch[1].trim();
+  
+  let quote = '';
+  // Find the end of the source block to start searching for the quote
   const sourceEndIndex = cardString.indexOf(sourceMatch[0]) + sourceMatch[0].length;
-  const quote = cardString.substring(sourceEndIndex).trim();
+  if (sourceEndIndex < cardString.length) {
+      quote = cardString.substring(sourceEndIndex).trim();
+  }
 
   return { claim, citation, quote };
 }
@@ -71,7 +76,8 @@ const fetchSchema = z.object({
 
 type ActionState = {
   message?: string | null;
-  evidence?: (EvidenceCardType & { citation: string })[] | null;
+  evidence?: EvidenceCardType | null;
+  id: number;
 };
 
 export async function runFetchAndExtractEvidence(prevState: ActionState, formData: FormData): Promise<ActionState> {
@@ -83,6 +89,7 @@ export async function runFetchAndExtractEvidence(prevState: ActionState, formDat
   if (!validatedFields.success) {
     return {
       message: 'Validation failed. Please check your inputs.',
+      id: prevState.id + 1,
     };
   }
 
@@ -92,24 +99,24 @@ export async function runFetchAndExtractEvidence(prevState: ActionState, formDat
     const result = await fetchAndExtractEvidenceFlow({ sourceUrl, argument });
     
     if (!result || !result.card) {
-      return { message: 'No evidence could be extracted. The AI returned an empty response. Try refining your argument or using a different article.', evidence: [] };
+      return { message: 'No evidence could be extracted. The AI returned an empty response. Try refining your argument or using a different article.', id: prevState.id + 1 };
     }
 
     const parsed = parseCardString(result.card);
     if (!parsed) {
       console.error("Failed to parse card string:", result.card);
-      return { message: 'Failed to parse the evidence returned from the AI. The format was incorrect.', evidence: [] };
+      return { message: 'Failed to parse the evidence returned from the AI. The format was incorrect.', id: prevState.id + 1 };
     }
-    const evidence = [{
+    const evidence = {
         ...parsed,
         explanation: '',
-    }];
-    return { evidence, message: null };
+    };
+    return { evidence, message: null, id: prevState.id + 1 };
     
   } catch (error) {
     console.error('Error fetching and extracting evidence:', error);
     const errorMessage = (error as Error).message || 'An unexpected error occurred while processing the article. Please try again later.';
-    return { message: errorMessage, evidence: null };
+    return { message: errorMessage, id: prevState.id + 1 };
   }
 }
 
@@ -129,6 +136,7 @@ export async function runExtractEvidence(prevState: ActionState, formData: FormD
     if (!validatedFields.success) {
         return {
             message: 'Validation failed. Please check your inputs.',
+            id: prevState.id + 1
         };
     }
 
@@ -138,23 +146,23 @@ export async function runExtractEvidence(prevState: ActionState, formData: FormD
         const result = await extractEvidenceFlow({ articleText, argument });
 
         if (!result || !result.card) {
-          return { message: 'No evidence could be extracted. The AI returned an empty response. Try refining your argument.', evidence: [] };
+          return { message: 'No evidence could be extracted. The AI returned an empty response. Try refining your argument.', id: prevState.id + 1 };
         }
 
         const parsed = parseCardString(result.card);
          if (!parsed) {
             console.error("Failed to parse card string:", result.card);
-            return { message: 'Failed to parse the evidence returned from the AI. The format was incorrect.', evidence: [] };
+            return { message: 'Failed to parse the evidence returned from the AI. The format was incorrect.', id: prevState.id + 1 };
         }
-        const evidence = [{
+        const evidence = {
             ...parsed,
             explanation: 'This evidence was extracted directly from the provided text based on your argument.',
-        }];
+        };
         
-        return { evidence: evidence, message: null };
+        return { evidence: evidence, message: null, id: prevState.id + 1 };
 
     } catch (error) {
         console.error('Error extracting evidence from text:', error);
-        return { message: 'An unexpected error occurred while processing the text.', evidence: null };
+        return { message: 'An unexpected error occurred while processing the text.', id: prevState.id + 1 };
     }
 }

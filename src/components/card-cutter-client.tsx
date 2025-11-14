@@ -1,11 +1,11 @@
 'use client';
 
-import { useActionState, useTransition } from 'react';
+import { useActionState } from 'react';
 import { useFormStatus } from 'react-dom';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useTheme } from 'next-themes';
 
 import { runExtractEvidence, runFetchAndExtractEvidence } from '@/lib/actions';
@@ -70,59 +70,47 @@ type ActionState = {
   id: number;
 };
 
+const initialActionState: ActionState = {
+    message: null,
+    evidence: null,
+    id: 0,
+};
+
 export function CardCutterClient() {
   const { toast } = useToast();
   const { theme } = useTheme();
   const [mounted, setMounted] = useState(false);
-  const [startTransition, isPending] = useTransition();
   const [evidenceList, setEvidenceList] = useState<EvidenceCardType[]>([]);
-
-  const [urlState, urlFormAction] = useActionState(runFetchAndExtractEvidence, {
-    message: null,
-    evidence: null,
-    id: 0,
-  });
   
-  const [textState, textFormAction] = useActionState(runExtractEvidence, {
-    message: null,
-    evidence: null,
-    id: 0,
-  });
+  const lastProcessedId = useRef(0);
+
+  const [urlState, urlFormAction, isUrlPending] = useActionState(runFetchAndExtractEvidence, initialActionState);
+  const [textState, textFormAction, isTextPending] = useActionState(runExtractEvidence, initialActionState);
 
   const [activeTab, setActiveTab] = useState('url');
   
-  // Use a unified state that updates based on the most recent action.
-  const [activeState, setActiveState] = useState<ActionState>({ message: null, evidence: null, id: 0 });
+  const activeState = activeTab === 'url' ? urlState : textState;
+  const isSubmitting = isUrlPending || isTextPending;
 
   useEffect(() => {
-    if (urlState.id > 0 && urlState.id !== activeState.id) {
-        setActiveState(urlState);
-        if (urlState.evidence) {
-            setEvidenceList(prev => [urlState.evidence!, ...prev]);
-        }
-    }
-  }, [urlState, activeState.id]);
-
-  useEffect(() => {
-    if (textState.id > 0 && textState.id !== activeState.id) {
-        setActiveState(textState);
-        if (textState.evidence) {
-            setEvidenceList(prev => [textState.evidence!, ...prev]);
-        }
-    }
-  }, [textState, activeState.id]);
-
-  useEffect(() => {
-    if (activeState?.message) {
-      toast({
-        variant: 'destructive',
-        title: 'An error occurred',
-        description: activeState.message,
-      });
+    if (activeState.id > lastProcessedId.current) {
+      if (activeState.message) {
+        toast({
+          variant: 'destructive',
+          title: 'An error occurred',
+          description: activeState.message,
+        });
+      } else if (activeState.evidence) {
+        setEvidenceList(prev => [activeState.evidence!, ...prev]);
+         toast({
+          title: 'Card Generated!',
+          description: 'A new evidence card has been extracted.',
+        });
+      }
+      lastProcessedId.current = activeState.id;
     }
   }, [activeState, toast]);
 
-  
   useEffect(() => {
     setMounted(true);
   }, []);
@@ -148,10 +136,6 @@ export function CardCutterClient() {
     },
   });
   
-  const { formState: urlFormState } = urlForm;
-  const { formState: textFormState } = textForm;
-
-  const isSubmitting = urlFormState.isSubmitting || textFormState.isSubmitting;
   const isDark = mounted && theme === 'dark';
 
 
@@ -333,7 +317,7 @@ export function CardCutterClient() {
             <div className="max-h-[60vh] overflow-y-auto scroll-fade p-2 -m-2 space-y-4">
               {evidenceList.map((ev, index) => (
                 <EvidenceCard
-                  key={index}
+                  key={`${lastProcessedId.current}-${index}`}
                   evidence={ev}
                 />
               ))}
