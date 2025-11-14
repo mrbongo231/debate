@@ -47,30 +47,26 @@ export async function getCongressSpeechAction(
 function parseCardString(cardString: string): { claim: string; citation: string; quote: string } | null {
   if (!cardString || typeof cardString !== 'string') return null;
 
-  const lines = cardString.split('\n');
+  const lines = cardString.split('\n').filter(line => line.trim() !== '');
   if (lines.length < 2) return null;
   
-  // The first line is the claim (tagline).
   const claim = lines[0].trim();
 
-  // Find where the citation ends. It's the line right before the full article text begins.
-  // We can assume the full text starts with a line that doesn't look like part of a citation.
-  // Let's find the first empty line or a line that seems to start the article body.
-  // A simple heuristic: find the end of the citation block which is usually marked by the cutter initials.
-  let citationEndIndex = 1;
+  let citationEndIndex = -1;
   for (let i = 1; i < lines.length; i++) {
-    citationEndIndex = i;
-    // A reasonably sure bet is the line after the citation contains the URL and cutter initials.
-    // The line after that is likely an empty line or the start of the article.
     if (lines[i].includes(']')) {
+      citationEndIndex = i;
       break;
     }
   }
 
-  // What if there are multiple lines in the citation? Let's join them.
+  if (citationEndIndex === -1) {
+     console.warn("Parsing failed: Could not find the end of the citation block.");
+     return null;
+  }
+  
   const citation = lines.slice(1, citationEndIndex + 1).join('\n').trim();
 
-  // Everything after the citation is the quote.
   const quote = lines.slice(citationEndIndex + 1).join('\n').trim();
 
   if (!claim || !citation || !quote) {
