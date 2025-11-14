@@ -34,8 +34,6 @@ const nextConfig: NextConfig = {
       },
     ],
   },
-  allowedForwardedHosts: ['localhost', '*.github.dev', '*.app.github.dev'],
-  allowedOrigins: ['localhost:9002', '*.github.dev', '*.app.github.dev'],
 };
 
 export default nextConfig;
