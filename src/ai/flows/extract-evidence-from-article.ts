@@ -49,13 +49,18 @@ Format example:
 Joining the Single Market takes over a decade.
 McGee 24 [Luke McGee; Emmy award-winning journalist covering European politics and diplomacy, 10-28-2024, “Sorry Rejoiners—The UK’s path back to Europe will be slow,” Prospect Magazine, https://www.prospectmagazine.co.uk/politics/brexit/68353/sorry-rejoinersthe-uks-path-back-to-europe-will-be-slow, DOA: 8-31-2025] shaan
 
-**🎯 RULE 2 — Cyan Highlighting With [highlight(...)]**
+**🎯 RULE 2 — Highlighting MUST Be Concise and Phrasal (MANDATORY)**
 
-All highlighting must use [highlight(...)] syntax. The highlight represents cyan (#00FFFF). Only highlight short, powerful phrases, NOT whole sentences. Every highlight must be shaped to improve argumentative flow. Highlight core claims, causal mechanisms, statistics, warrants, and impacts. Do NOT highlight full paragraphs or bold random text.
+Your most important job is to **shape** the evidence. This means you must **NOT** highlight full sentences. Instead, you will extract and highlight only the most essential phrases, claims, warrants, and impacts.
+
+*   **DO:** \`...the economy shows signs of [highlight(slowing significantly)]...\`
+*   **DO NOT:** \`[highlight(The economy is showing signs that it is slowing down significantly.)]\`
+
+The goal is to isolate the core argument. Highlight short, powerful phrases. Every highlight must be shaped to improve argumentative flow. Highlight core claims, causal mechanisms, statistics, and impacts. Do NOT highlight full paragraphs or bold random text.
 
 **🎯 RULE 3 — Conciseness and Flow**
 
-Your goal is to make the card clean, professional, concise but not choppy, and shaped for in-round readability. The highlights must read smoothly when spoken.
+Your goal is to make the card clean, professional, concise but not choppy, and shaped for in-round readability. The highlights must read smoothly when spoken. You may skip unimportant filler words or clauses to connect the most important phrases.
 
 **🎯 RULE 4 — Full Article Appears Below the Cite (MANDATORY)**
 
