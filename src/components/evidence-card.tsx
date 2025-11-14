@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import type { EvidenceCard as EvidenceCardType, Citation } from '@/lib/definitions';
+import type { EvidenceCard as EvidenceCardType } from '@/lib/definitions';
 import {
   Card,
   CardContent,
@@ -11,7 +11,7 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Save, Copy } from 'lucide-react';
+import { Copy } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useTheme } from 'next-themes';
 
@@ -22,61 +22,23 @@ interface EvidenceCardProps {
 
 export function EvidenceCard({ evidence, highlightColor = '#00FFFF' }: EvidenceCardProps) {
   const { toast } = useToast();
-  const [isSaved, setIsSaved] = useState(false);
   const { theme } = useTheme();
   const isDark = theme === 'dark';
 
   const getHighlightCss = () => {
     const color = highlightColor;
-    const alpha = isDark ? '40' : '30'; // 40% opacity for dark, 30% for light
+    const alpha = isDark ? '40' : '30';
     return `${color}${alpha}`;
-  };
-  
-  const handleSave = () => {
-    try {
-      const savedEvidence = JSON.parse(localStorage.getItem('evidenceLibrary') || '[]');
-      const newCard = {
-        claim: evidence.claim,
-        quote: evidence.quote, 
-        citation: evidence.citation,
-      };
-      
-      const isDuplicate = savedEvidence.some((card: any) => card.quote === newCard.quote && card.claim === newCard.claim);
-
-      if (!isDuplicate) {
-        savedEvidence.push(newCard);
-        localStorage.setItem('evidenceLibrary', JSON.stringify(savedEvidence));
-        setIsSaved(true);
-        toast({
-          title: 'Card Saved!',
-          description: 'This evidence card has been added to your local library.',
-        });
-      } else {
-        setIsSaved(true);
-        toast({
-          variant: 'default',
-          title: 'Already Saved',
-          description: 'This card is already in your library.',
-        });
-      }
-    } catch (error) {
-      toast({
-        variant: 'destructive',
-        title: 'Save Failed',
-        description: 'Could not save the card to your library.',
-      });
-    }
   };
 
   const handleCopy = () => {
     const cardHtml = `
       <p><b>${evidence.claim}</b></p>
-      <pre style="white-space: pre-wrap; font-family: monospace;">${evidence.citation}</pre>
+      <pre style="white-space: pre-wrap; font-family: monospace; color: #666;">${evidence.citation}</pre>
       <p>${
-        evidence.quote.replace(/\[highlight\(([\s\S]*?)\)\]/g, `<span style="background-color: ${getHighlightCss()};">$1</span>`)
+        evidence.quote.replace(/\[highlight\(([\s\S]*?)\)\]/g, `<span style="background-color: ${highlightColor}4D;">$1</span>`)
       }</p>
     `;
-
     const plainText = `${evidence.claim}\n${evidence.citation}\n\n${evidence.quote.replace(/\[highlight\(([\s\S]*?)\)\]/g, '$1')}`;
 
     try {
@@ -85,11 +47,10 @@ export function EvidenceCard({ evidence, highlightColor = '#00FFFF' }: EvidenceC
       navigator.clipboard.write(data).then(() => {
         toast({
           title: 'Copied to Clipboard!',
-          description: 'The evidence card has been copied.',
+          description: 'The evidence card has been copied with highlighting.',
         });
       });
     } catch(e) {
-      // Fallback for older browsers
       navigator.clipboard.writeText(plainText).then(() => {
         toast({
           title: 'Copied to Clipboard!',
@@ -100,7 +61,6 @@ export function EvidenceCard({ evidence, highlightColor = '#00FFFF' }: EvidenceC
   };
 
   const renderHighlightedCard = (card: string) => {
-    // This regex will find all occurrences of [highlight(...)] and the text between them.
     const parts = card.match(/\[highlight\(([\s\S]*?)\)\]|[\s\S]+?(?=\[highlight\(|$)/g) || [];
     
     return (
@@ -119,7 +79,6 @@ export function EvidenceCard({ evidence, highlightColor = '#00FFFF' }: EvidenceC
       </p>
     );
   };
-
 
   return (
     <Card className={`${isDark ? 'bg-gradient-to-br from-gray-900/80 to-purple-900/30 backdrop-blur-lg border border-purple-500/30' : 'bg-card border-border'}`}>
@@ -140,10 +99,6 @@ export function EvidenceCard({ evidence, highlightColor = '#00FFFF' }: EvidenceC
         <Button variant="outline" onClick={handleCopy}>
           <Copy className="mr-2 h-4 w-4" />
           Copy
-        </Button>
-        <Button onClick={handleSave} disabled={isSaved}>
-          <Save className="mr-2 h-4 w-4" />
-          {isSaved ? 'Saved' : 'Save to Library'}
         </Button>
       </CardFooter>
     </Card>
