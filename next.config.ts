@@ -36,7 +36,12 @@ const nextConfig: NextConfig = {
   },
   serverActions: {
     allowedForwardedHosts: ['localhost', '*.github.dev', '*.app.github.dev'],
-    allowedOrigins: ['localhost:9002', '*.github.dev', '*.app.github.dev'],
+    allowedOrigins: [
+      'localhost:9002', 
+      '*.github.dev', 
+      '*.app.github.dev',
+      'legendary-engine-5ggp49946476hvxxw-9002.app.github.dev',
+    ],
   },
 };
 
